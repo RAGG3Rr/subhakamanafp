@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{%block css%}
+	<style>
+		#div_id_price{
+			display:none;
+		}
+	</style>
+{%endblock css%}
+{% block content %}
+<div class="container">
+    <h3 class="text-center">Update an item</h3>
+    <div class="row">
+        <div class="col-12">
+            <form action="{% url 'update_product' product_id%}" id="updateProduct" method="POST" enctype="multipart/form-data" data-sub-categories="{% url 'get_subcategories'%}" data-specific-categories="{% url 'get_specificcategories'%}">
+                {% csrf_token %}
+                {{u_form|crispy}}
+                {{img_form|crispy}}
+                <button type="submit" id="productsubmit" class="btn btn-secondary">Update</button>
+				
+				<div class="row form-group" id="other" style="margin:0px auto;display:none;">
+				<div style="float:left;" id="otherfeature" style="display:none;">
+					<table class="table table-responsive table-bordered table-striped table-hover" id="newfeature">
+						<thead>
+						<tr>
+							<th></th>
+							<th>Size</th>
+							<th>Normal Price</th>
+							<th>Retail Price</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+							<td><input type="hidden" id="newid" value="" placeholder="Enter price"></td>
+							<td><input class="form-control" type="text" id="feature" value="" placeholder="Add variants..."></td>
+							<td><input class="form-control" type="number" id="newprice" value="" min="0" placeholder="Enter price"></td>
+							<td><input class="form-control" type="number" id="retailprice" value="" min="0" placeholder="Enter Retail Price"></td>
+							<td id="addbutton"><strong><a href="javascript:void(0);" id="addnew" class="remove_row "><i class="fa fa-plus"></i>Add new</a></strong> </td>
+							
+							
+							
+							<td style="display:none;" id="rem">
+								<!-- <input class="remove_row" type="button" value="Remove">Remove -->
+								<strong><a href="javascript:void(0);" id="add_bank_info" class="remove_row ">Remove</a></strong>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+					</div>
+					<div id="selectcolor" style="display:none;float:right;width:50%;padding-left:10px;">
+						<p style="font-size:18px;font-weight:bold;">Select Colors</p>
+						<select class="col-sm-4 form-control" id="set_colors" style="height:100px;" multiple>
+								{% for i in colors %}
+									<option value="{{i.id|safe}}" style="font-size: 16px;    padding: 5px;">{{i.name|safe}}</option>
+								{% endfor %}
+								</select>
+					</div>
+					<input type="hidden" id="allfeature" name="allfeature" value="">
+					<input type="hidden" id="colorfeature" name="colorfeature" value="">
+				</div>
+				</div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function () {
+			
+			{% if features.count > 0 %}
+				$('#id_product_title').after($("#other"));
+				$('#other').show();
+				$('#otherfeature').show();
+				
+				var findtr = $('#newfeature').find('tbody').find('tr:last');
+				findtr.find('#feature').val('{{features.all.0.description|safe}}');
+				findtr.find('#newprice').val('{{features.all.0.price|safe}}');
+				findtr.find('#retailprice').val('{{features.all.0.retailprice|safe}}');
+				
+				{% for obj in features %}
+					var ele = $('#newfeature').find('tbody').find('tr:last');
+					var ele_clone = ele.clone();
+					ele_clone.find('input').attr("disabled", false).val('');
+					ele_clone.find("#addbutton").remove();
+					ele_clone.find('td:last').show();
+					ele.after(ele_clone);
+					ele_clone.show();
+					ele.find('#newid').val('{{obj.id|safe}}');
+					ele.find('#feature').val('{{obj.description|safe}}');
+					ele.find('#newprice').val('{{obj.price|safe}}');
+					ele.find('#retailprice').val('{{obj.retailprice|safe}}');
+					$('.remove_row').show();
+					ele_clone.find('#rem').click(function() {
+						var row_index = $(this).closest('tr').index();
+						$(this).closest('tr').remove();
+					});
+				{% endfor %}
+				var lastrow = $('#newfeature').find('tbody').find('tr:last');
+				lastrow.closest('tr').remove();
+			{% endif %}
+			col='{{specific_col}}'
+			if (col.length>=3){
+				$('#id_product_title').after($("#other"));
+				$('#other').show();
+				$('#selectcolor').show();
+				//alert('checked');
+				{% for i in colors %}
+					{% for obj in specific_col %}
+						if ('{{obj.id|safe}}'=='{{i.id|safe}}'){
+							$("#set_colors option[value='" + '{{i.id|safe}}' + "']").prop("selected", true);
+						}
+						
+					{% endfor %}
+				{% endfor %}
+				}
+			else{
+				$('#selectcolor').hide();
+			}
+		    
+    });
+status=0;
+features=[];
+prices=[];
+error={};
+
+$('#addnew').click(function(){
+	var ele = $('#newfeature').find('tbody').find('tr:last');
+    var ele_clone = ele.clone();
+    ele_clone.find('input').attr("disabled", false).val('');
+	ele_clone.find("#addbutton").remove();
+    ele_clone.find('td:last').show();
+	ele.after(ele_clone);
+    ele_clone.show();
+	$('.remove_row').show();
+	ele_clone.find('#rem').click(function() {
+	  var row_index = $(this).closest('tr').index();
+      $(this).closest('tr').remove();
+    });
+});
+
+
+$("#productsubmit").click(function(e) {
+<!-- $('#id_price').change(function(){ -->
+
+  e.preventDefault();
+  rowCount = $('#newfeature tr').length;
+  
+	for (var i = 1; i <rowCount; i++) {
+			var ele = $('#newfeature').find('tbody').find('tr:nth-child(' + i + ')');
+			var ele_clone = ele.clone(); 
+			var tableRow = ele.closest("tr");
+			var featureid = tableRow.find("#newid").val();
+			var feature = tableRow.find("#feature").val();
+			var price = tableRow.find("#newprice").val();
+			var retailprice = tableRow.find("#retailprice").val();
+			if ((feature=='')||(price=='')||(retailprice=='')){
+				status=1;
+				error='One of the feature/price is blank! Please rectify it';
+			}
+			if ((feature=='')&&(price=='')||(retailprice=='')){
+				status=0;
+			}
+			else{
+			features.push(featureid,feature,price,retailprice);
+			}
+			
+	}
+  
+  var colors=$('#set_colors').val();
+  
+  features=JSON.stringify(features)
+  $("#allfeature").val(features);
+  $("#colorfeature").val(colors);
+  
+  if (status==1){
+	alert(error);
+	features.length=0;
+	status=0;
+  }
+  else{
+	$('#updateProduct').submit();
+	
+  }
+});
+	
+	
+    $("#id_main_category").change(function(){
+        const url = $("#updateProduct").attr("data-sub-categories");
+        const main_category_id = $(this).val();
+		
+        $.ajax({
+            url: url,
+            data: {
+                'main_category_id': main_category_id
+            },
+            success: function (data){
+                let html_data = '<option value="">--------------</option>';
+                data.forEach(function(sub_dropdown){
+                    html_data += `<option value="${sub_dropdown.id}" >${sub_dropdown.sub_category}</option>`
+                });
+                
+                $("#id_sub_category").html(html_data);
+            }
+        })
+    })
+    $("#id_sub_category").change(function(){
+        const url = $("#updateProduct").attr("data-specific-categories");
+        const sub_category_id = $(this).val();
+		
+        {% for obj in sub %}
+			if('{{obj.id}}'== sub_category_id){
+				if('{{obj.Add_features}}'== 'True'){
+					$('#id_product_title').after($("#otherfeature"));
+					$('#otherfeature').show();
+				}
+				else{
+					$('#otherfeature').hide();
+				}
+			}
+		{% endfor %}
+		
+        $.ajax({
+            url: url,
+            data: {
+                'sub_category_id': sub_category_id
+            },
+            success: function (data){
+                let html_data = '<option value="">--------------</option>';
+                data.forEach(function(specific_dropdown){
+                    html_data += `<option value="${specific_dropdown.id}">${specific_dropdown.specific_category}</option>`
+                });
+               // console.log(html_data);
+                $("#id_specific_category").html(html_data);
+            }
+        })
+    })
+</script>
+{% endblock %}

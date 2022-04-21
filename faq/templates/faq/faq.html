@@ -1,0 +1,24 @@
+{% extends "base.html"%}
+{% block content %}
+<h2 class="text-center mt-3">Frequently Asked Questions</h2>
+<div class="container mt-5">
+    <div class="mb-5">
+        {% for qn in faq %}
+            <li class="list-group-item" id="answer{{ qn.id }}">{{ qn.question }}<i class="fa fa-sort-down pull-right"></i>
+                <div class="text-content mt-2 answer">
+                    <p>{{qn.answer}}</p>
+                </div>
+            </li>
+            <script>
+                $(".text-content").hide();
+                $("#answer{{ qn.id }}").click(function () {
+                    if($('#answer{{ qn.id }} .text-content').is(":hidden")){
+                        $(".text-content").slideUp(500);
+                    }
+                    $("#answer{{ qn.id }} .text-content").toggle(500);
+                });
+            </script>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

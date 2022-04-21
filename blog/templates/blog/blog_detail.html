@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{%block css%}
+    <style>
+        a{
+            text-decoration:none !important;
+        }
+        .card-body > p {
+            text-align:justify ;
+        }
+    </style>
+{%endblock%}
+{% block content %}
+{% comment %} <section class="news-header my-2">
+    <div class="bg text-center">
+        <h2 class="news-title">Blog</h2>
+    </div>
+</section> {% endcomment %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-9 news-content">
+            <div class="card mb-3 mt-2 news-card">
+                <h2 class="card-title text-center mt-3">{{ blog_detail.blog_title }}</h2>
+                <a href="{{ blog_detail.blog_img.url }}" class="fancybox" data-fancybox="gallery">
+                    <img class="card-img-top" src="{{ blog_detail.blog_img.url }}" alt="Card image cap">
+                </a>
+                <div class="card-body">
+                  <p class="card-text text-justify">{{ blog_detail.blog_content |linebreaks }}</p> <hr>
+                  <p class="card-text"><small class="text-muted">{{ blog_detail.date }}</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mt-2 d-sm-none d-md-block">
+            <h3 class="text-center">Recent Posts</h3>
+            {% for latest in latest_blog %}
+            <a href="{% url 'detail' latest.id %}">
+                <div class="card m-2">
+                    <img class="card-img-top" src="{{ latest.blog_img.url }}" alt="Card image cap">
+                    <div class="card-body">
+                      <h5 class="card-title"><a href="{% url 'detail' latest.id %}">{{ latest.blog_title}}</a></h5>
+                      <p class="card-text">{{ latest.blog_content| truncatewords:10}}</p>
+                    </div>       
+                </div>
+            </a>
+            {% empty %}
+            <p>No recent posts.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

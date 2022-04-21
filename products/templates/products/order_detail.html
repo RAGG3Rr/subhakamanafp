@@ -1,0 +1,122 @@
+{% extends "base.html"%}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content%}
+<h3 class="text-center mt-3">Transaction No: {{orders.transaction_id}}</h3>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h5 class="text-center mb-3">User Information</h5>
+                    <p>Name: {{orders.customer.first_name}} {{orders.customer.last_name}}</p>
+                    <p>Email: {{orders.customer.email}}</p>
+                    <p>Username: {{orders.customer}}</p>
+                    <p>Phone: {{address.phone|safe}}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h5 class="text-center mb-3">Shipping Information</h5>
+                    <p>Address: {{address.address}}</p>
+                    <p>City: {{address.city}}</p>
+                    <p>Provience: {{address.state}}</p>
+                    <p>Zipcode: {{address.zipcode}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-2">
+            <div class="card-body">
+                <p>Payment Medium: <span style="font-weight:bold;"> {{ payment_mode}}</span></p>
+                
+                <p>Order Status: <span style="font-weight:bold;">{{status}} </span>&nbsp;
+                    {% if user.is_superuser %}
+                    <a type="button" data-toggle="modal" data-target="#orderupdate" href="#">Update</a>
+                    {%endif %}
+                </p>
+				<p id="updateorderstatus" style="color:blue;"></p>
+            </div>
+        </div>
+		
+		<div class="modal fade" id="orderupdate" tabindex="-1" role="dialog" aria-labelledby="orderupdateTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Change Order Status</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="font-size: 20px;">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+						<form action="#" id="orderstatus" method="POST" >
+							{% csrf_token %}
+							{{form|crispy}}
+							<button type="button" id="proceedorder" class="btn btn-success" >Update</button>
+							<input type="button" class="btn btn-secondary" data-dismiss="modal" value="Close">
+					    </form>
+                    </div>
+                    <div class="modal-footer">
+													
+                    </div>
+                  </div>
+                </div>
+            </div>
+		
+        <table class="table mt-3" id="myTable">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">S.N.</th>
+                <th scope="col">Ordered Date</th>
+                <th scope="col">Product</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td style="width: 20%;">{{item.order.date_ordered}}</td>
+                    <td>{{item.name}}
+					<p style="color:blue;margin:0px 0px;">
+						Size:  {{item.features|default_if_none:''}}
+						</p>
+						<p style="color:blue;margin:0px 0px;">
+						Color:  {{item.colors|default_if_none:''}}</p></td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{ item.price }}</td>
+                    <td><a href="{% url 'product-detail' item.product.slug %}">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table><hr>
+        <div class="float-right">
+            <p><strong>Total:</strong> Rs.{{total}}</p> <br>
+            <p><strong>Shipping:</strong> Rs.{{shipping}}</p><br>
+            <p><strong>Grand Total:</strong> Rs.{{grand_total}}</p>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+<script>
+		$(".modal-body #proceedorder").click(function(e) {
+			e.preventDefault();
+			var status = $('#id_order_status').val();
+			var orderid = '{{orders.id|safe}}';
+			$.ajax({
+            url: '/update_orderstatus/',
+            data: {
+                'status': status,
+				'orderid':orderid
+            },
+            success: function (data){
+					console.log(data);
+					window.location.reload();
+					$('#updateorderstatus').text(data);
+                },
+			error: function(data) {
+                console.log(data);
+            },
+            })
+		});
+</script>	
+{%endblock%}

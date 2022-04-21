@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{%block css%}
+    <!-- Data Tables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+{%endblock%}
+{% block content%}
+<div class="container-fluid">
+    <div class="row mt-2">
+        <div class="col-md-6">
+            <a href="{% url 'add_product' %}"><i class="far fa-plus-square pl-2 mt-3 mb-3" style="color: blue;"></i> Add Product</a>
+        </div>
+        <div class="col-md-6">
+            <div class="{% if all_items %} dropdown dropleft{% endif %} float-right">
+                <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Notifications<span class="badge badge-pill badge-warning ml-2" id="warn">0</span>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for product in all_items %}
+                    {% if product.items_in_stock == 0%}
+                    <a href="{% url 'product-detail' product.slug %}" class="dropdown-item" style="color: red; text-decoration: none !important;">{{product.product_title}} is out of stock!</a>
+                    <div class="dropdown-divider"></div>
+                    {% endif %}
+                    {% if product.items_in_stock <= 3 and product.items_in_stock != 0 %}
+                    <a href="{% url 'product-detail' product.slug %}" class="dropdown-item" style="text-decoration: none !important; color:black">{{product.product_title}} has only {{product.items_in_stock}} stocks left.</a>
+                    <div class="dropdown-divider"></div>
+                    {% endif %}
+                <script>
+                    repeated = document.getElementsByClassName("dropdown-item").length;
+                    document.getElementById("warn").innerHTML = repeated;
+                </script>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <table class="table" id="myTable">
+        <thead class="thead-dark text-center">
+          <tr>
+            <th scope="col">Product Name</th>
+            <th scope="col">Image</th>
+            <th scope="col">Normal</th>
+            <th scope="col">Retail</th>
+            <th scope="col">Action</th>
+            {%if check == "nosale"%}<th scope="col">Add to sale</th>{%endif%}
+            <th scope="col">Items in Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for product in all_items %}
+            <tr class="text-center">
+                <td style="width: 30%">{{product.product_title}}</td>
+                <td><img src="{{product.image.url}}" class="row-image" alt=""></td>
+                <td>
+                    {%for i in product.mobilememory_set.all%}
+                    <p>Size: {{i.description}} - Price: {{i.price}}</p>
+                    {%endfor%}
+                    {% comment %} <p style="font-size:16px">Rs.{%if product.mobilememory_set.first.price%}{{product.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{product.price|default_if_none:' ...'}}{%endif%}</p> {% endcomment %}
+                </td>
+                <td>
+                    {%for i in product.mobilememory_set.all%}
+                        <p>Size: {{i.description}} - Price: {{i.retailprice}}</p>
+                    {%endfor%}
+                    {% comment %} <p style="font-size:16px">Rs.{%if product.mobilememory_set.first.retailprice%}{{product.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{product.price|default_if_none:' ...'}}{%endif%}</p> {% endcomment %}
+                </td>
+                <td>
+                    <a href="{% url 'product-detail' product.slug %}"><i class="fas fa-eye pr-2" style="color: green"></i></a>
+                    {%if check == "nosale"%}
+                        <a href="{% url 'update_product' product.id|safe %}"><i class="fas fa-edit pr-2" style="color: #000;"></i></a>
+                    {%else%}
+                        <a href="{% url 'updatedeal' product.id|safe %}"><i class="fas fa-edit pr-2" style="color: #000;"></i></a>
+                    {%endif%}
+                    <a href="#" class="prodelete" data-id="{{product.id|safe}}"><i class="fas fa-trash-alt pr-2" style="color: red;" data-toggle="modal"  data-target="#delete"></i></a>
+					
+                    <!-- Modal -->
+                    <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="deleteTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="deleteTitle">Delete Product</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete this item? 
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                {%if check == "nosale"%}
+                                <form action="{% url 'delete_product' product.id|safe %}" method="POST" >
+                                    {% csrf_token %}
+									<input type="hidden" name="deleteId" id="delid" value=""/>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                                {%else%}
+                                    <a href="{%url 'deletedeal' product.id|safe%}" class="btn btn-danger">Delete</a> 
+                                {%endif%}
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </td> 
+                {%if check == "nosale"%}<td><a href={%url 'deal' product.id%}>add to sale</a></td>{%endif%}
+                <td>{{product.items_in_stock}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#myTable').DataTable({
+            searching: true,
+            ordering: false,
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            // dom: '<"top">rt<"bottom"lfp><"clear">',
+        });
+    } );
+    
+	$('.prodelete').click(function(){
+		var newid = $(this).data('id');
+		$(".modal-footer #delid").val(newid);
+	});
+</script>
+{% endblock %}

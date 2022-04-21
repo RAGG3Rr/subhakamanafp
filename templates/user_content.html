@@ -1,0 +1,43 @@
+{% for content in user_content %}
+    <section class="pt-3" id="{{content.id}}">
+        {% if content.heading %}
+        <h1 class="text-center word mb-5">{{ content.heading }}</h1>
+        {% endif %}
+        {% if content.image %}
+            {% if content.image_right == False %}
+            <div class="container mb-5">
+                <h3>{{ content.title }}</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="{{ content.image.url }}" alt="img" class="dynamic-img {% if content.rounded_image == True %}rounded-circle{% endif %}" height="450px">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="align-self-end">
+                            {{ content.content | safe}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class="container mb-5">
+                    <h3>{{ content.title }}</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="align-self-end">
+                                {{ content.content | safe}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <img src="{{ content.image.url }}" alt="img" class="dynamic-img {% if content.rounded_image == True %}rounded-circle{% endif %}" height="450px">
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="container mb-5">
+                <h3>{{ content.title }}</h3>
+                {{ content.content | safe }}
+            </div>
+        {% endif %}
+    </section>
+    {% endfor %}

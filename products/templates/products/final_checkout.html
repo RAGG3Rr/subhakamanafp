@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include "categories.html"%}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-6">
+            
+            <div class="box-element" id="payment-info">
+                <h5>Payment Options</h5> <br>
+                <div class="container">
+                    <div class="row text-center">
+						<div class="col-md-6">
+                            <a href="" style="text-decoration: none; color: #000;">
+                                <img src="{% static 'images/card.png'%}" alt="" height="100" width="100">
+                                <p>Pay with Card</p>
+                            </a>
+                        </div>
+						{% for pay in payments %}
+                        <div class="col-md-6">
+                            <a href="" class="paymentstat" data-name="{{pay.payment_name|safe}}" data-id="{{pay.id|safe}}" data-toggle="modal" data-target="#exampleModalCenter" style="text-decoration: none; color: #000;">
+                                <img src="{{pay.image.url}}" alt="" height="100" width="100">
+                                <p>{{pay.payment_name}}</p>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+					<!-- <div class="row text-center">
+                        <div class="col-md-6">
+                            <a href="" class="paymentstat" data-id="esewa" data-toggle="modal" data-target="#exampleModalCenter" style="text-decoration: none; color: #000;">
+                                <img src="{% static 'images/esewa.jpg'%}" alt="" height="80" width="100">
+                                <p>eSewa</p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="" class="paymentstat" data-id="khalti" data-toggle="modal" data-target="#exampleModalCenter" style="text-decoration: none; color: #000;">
+                                <img src="{% static 'images/khalti.png'%}" alt="" height="80" width="100">
+                                <p>Khalti</p>
+                            </a>
+                        </div>
+                    </div>
+					<div class="row text-center">
+                        <div class="col-md-6">
+                            <a href="" class="paymentstat" data-id="ime" data-toggle="modal" data-target="#exampleModalCenter" style="text-decoration: none; color: #000;">
+                                <img src="{% static 'images/ime.png'%}" alt="" height="80" width="100">
+                                <p>IMEPAY</p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="" class="paymentstat" data-id="prabhu" data-toggle="modal" data-target="#exampleModalCenter" style="text-decoration: none; color: #000;">
+                                <img src="{% static 'images/prabhu1.png'%}" alt="" height="80" width="100">
+                                <p>Prabhu pay</p>
+                            </a>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Proceed for Order</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="font-size: 20px;">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Your order confirmation will be sent to your email shortly once you proceed.
+					  PAYMENT TYPE: <span id="ourpaymenttype" style="font-weight:bold;"></span><br>
+					  PAYMENT ID: <span id="ourpaymentid" style="font-weight:bold;color:red;"></span>
+                    </div>
+                    <div class="modal-footer">
+							<input type="button" class="btn btn-secondary" data-dismiss="modal" value="Close">
+						<form action="{% url 'orderpayment' ourorder.id|safe%}" id="paymentsubmit" method="POST" >
+							{% csrf_token %}
+							<input type="hidden" name="paymenttype" id="paytype" value="">
+							<button type="button" id="proceedorder" class="btn btn-success" >Proceed</button>
+						
+					    </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-lg-6">
+            <div class="box-element">
+                <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+                <hr>
+                <h3>Order Summary</h3>
+                <hr>
+                {% for item in items %}
+                <div class="cart-row">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img class="row-image" src="{{ item.product.image.url }}">
+                        </div>
+                        <div class="col-md-8">
+							<div>
+								<p style="margin:0px 0px;"><b>Product:</b> {{item.product.product_title}}
+								<p style="color:blue;margin:0px 0px;">
+									Size:  {{item.features|default_if_none:''}}
+									</p>
+									<p style="color:blue;margin:0px 0px;">
+									Color:  {{item.colors|default_if_none:''}}</p> 
+								</p>
+							</div>
+                            <div><p><b>Price:</b> Rs. {{item.price}}</p></div>
+                            <div><p><b>Quantity:</b> {{item.quantity}}</p></div>
+                        </div>
+                    </div>
+                </div><hr>
+                {% endfor %}
+                <h5>Items:   {{order.get_cart_items}}</h5>
+                <!-- <h5>Total:   Rs. {{order.get_cart_total|floatformat:2}}</h5> -->
+				<h5 style="font:weight:bold">Total:<span style="margin-left:30px;font-weight:bold;"> Rs. {{order.get_cart_total|floatformat:2}}</span></h5> 
+				<h5 style="font:weight:bold">Shipping Charges:<span style="margin-left:30px;"> Rs. {{shipping}}</span></h5> 
+                <h5>Grand Total:<span style="margin-left:30px;font-weight:bold;">   Rs. {{grand_total}}</span></h5>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	
+    $('.paymentstat').click(function(){
+		var newid = $(this).data('id');
+		var payname=$(this).attr('data-name');
+		console.log(payname);
+		{% for p in payments %}
+		//console.log('{{p.id|safe}}');
+			if('{{p.id|safe}}'==newid){
+				$(".modal-body #ourpaymenttype").text('{{p.payment_name|safe}}');
+				$(".modal-body #ourpaymentid").text('{{p.payment_id|safe}}');
+			}
+		{% endfor %}
+		$(".modal-footer #paytype").val(payname);
+	}); 
+	$('#proceedorder').click(function(){
+		//console.log('submitted');
+		$('#paymentsubmit').submit();
+	});
+	
+</script>
+{% endblock %}

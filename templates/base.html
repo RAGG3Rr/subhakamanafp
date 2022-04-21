@@ -1,0 +1,271 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/jpg" href="{% static 'images/logo.png' %}"/>
+    <!-- JQUERY -->
+    <script src="{%static 'js/jquery.js'%}"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{%static 'css/bootstrap4.min.css'%}" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="{%static 'css/owl.carousel.min.css'%}" />
+	
+	<!-- about us -->
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+  
+  
+    {% block css%}
+    {% endblock %}
+    <title>Subhakamana Footwears|Ecommerce</title>
+    <script type="text/javascript">
+      var user = '{{request.user}}'
+
+      function getToken(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      const csrftoken = getToken('csrftoken');
+
+      function getCookie(name) {
+		    // Split cookie string and get all individual name=value pairs in an array
+		    var cookieArr = document.cookie.split(";");
+
+		    // Loop through the array elements
+		    for(var i = 0; i < cookieArr.length; i++) {
+          var cookiePair = cookieArr[i].split("=");
+
+          /* Removing whitespace at the beginning of the cookie name
+          and compare it with the given string */
+          if(name == cookiePair[0].trim()) {
+            // Decode the cookie value and return
+            return decodeURIComponent(cookiePair[1]);
+          }
+		    }
+
+		    // Return null if not found
+		    return null;
+	  	}
+
+		  var cart = JSON.parse(getCookie('cart'))
+
+      if (cart == undefined){
+        cart = {}
+        document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+		  }
+    </script>
+</head>
+
+
+<body>
+<!-- Messenger Chat plugin Code -->
+<div id="fb-root"></div>
+
+<!-- Your Chat plugin code -->
+<div id="fb-customer-chat" class="fb-customerchat">
+</div>
+
+<script>
+  var chatbox = document.getElementById('fb-customer-chat');
+  chatbox.setAttribute("page_id", "106802238674815");
+  chatbox.setAttribute("attribution", "biz_inbox");
+</script>
+
+<!-- Your SDK code -->
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      xfbml            : true,
+      version          : 'v13.0'
+    });
+  };
+
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>
+
+    {% url 'home' as home %}
+    {% url 'account_set_password' as setpassword %}
+    {%include "navbar.html"%}
+
+    {% if request.path != home %}
+      {% if messages %}
+        <div class="container-fluid mt-5 mb-0">
+          {% for message in messages%}
+            <div class="alert alert-{{ message.tags }} mt-3">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if password_reuse == False %}
+      <div class="container-fluid  {% if not messages %}mt-5{% endif %}">
+        <div class="alert alert-danger">
+          <span> Please set your password so that you do not get logged out of your account. <a href="/set_password">Set Password</a> </span>
+        </div>
+      </div>
+      {% endif %}
+    {% endif %}
+	
+    <div class="full-height">
+		
+      {% block content %}
+      {% endblock %}
+
+      {% comment %} popup after add to cart click {% endcomment %}
+      <div class="modal fade" id="cartmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header" style="border-bottom:None">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body text-center" style="border-bottom:None">
+              <i class="fas fa-check-circle" style="color:#06FF00"></i>
+              <h3>Successfully added to cart.</h3>
+            </div>
+            <div class="modal-footer justify-content-center" style="border-top:None">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Continue Shopping</button>
+              <a href="{%url 'cart'%}" class="btn btn-success">GO TO CART</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+	  <div id="fb-root"></div>
+		<div id="fb-customer-chat" class="fb-customerchat"></div>
+    </div>
+
+    <!-- Javacript -->
+    <script src="{%static 'js/bootstrap4.bundle.min.js'%}"></script>
+    <script src="{%static 'js/owl.carousel.min.js'%}"></script>
+	<!-- about us -->
+	
+    <script src="{% static 'js/okzoom.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}" async></script>
+
+    {% block js %}{%endblock js%}
+    <script>
+      
+      $(document).ready(function(){
+		  $(".newposter").owlCarousel({
+            pagination: false,
+            autoplay: true,
+            margin: 10,
+            dots:false,
+            nav: true,
+            navText:["<div class='nav-btn prev-slide'></div>","<div class='nav-btn next-slide'></div>"],
+            responsive: {
+              0:{
+                items: 2
+              },
+              700:{
+                items: 3
+              },
+              1000:{
+                items: 3
+              },
+              1200:{
+                items: 3
+              }
+            }});
+			
+          $(".owl-carousel").owlCarousel({
+            pagination: false,
+            autoplay: true,
+            margin: 10,
+            dots:false,
+            nav: true,
+            navText:["<div class='nav-btn prev-slide'></div>","<div class='nav-btn next-slide'></div>"],
+            responsive: {
+              0:{
+                items: 2
+              },
+              700:{
+                items: 3
+              },
+              1000:{
+                items: 4
+              },
+              1200:{
+                items: 6
+              }
+            }
+          });
+		  
+          });
+        
+
+        $(document).ready(function(){
+          $("#owl-example-next").owlCarousel({
+            pagination: false,
+            autoplay: true,
+            margin: 10,
+            dots:false,
+            nav: true,
+            navText:["<div class='nav-btn prev-slide'></div>","<div class='nav-btn next-slide'></div>"],
+            responsive: {
+              0:{
+                items: 1
+              },
+              700:{
+                items: 2
+              },
+              1000:{
+                items: 3
+              },
+              1200:{
+                items: 3
+              }
+            }
+          });
+        });
+
+		
+		 
+        $(document).ready(function(){
+          $('.display-img > img').click(function(){
+              var smallImages = $(this).attr('src')
+              $('.undeal-img > img').attr('src', smallImages)
+          })
+
+          $('.undeal-img > img').okzoom({
+            width: 200,
+            height: 200,
+            round: true,
+            background: "#fff",
+            //backgroundRepeat: "repeat",
+            shadow: "0 0 5px #000",
+            border: "1px solid black"
+          });
+
+        });
+    </script>
+    {%include "footer.html"%}
+</body>
+</html>

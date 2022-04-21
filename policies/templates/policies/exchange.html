@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>		
+.exchange_wrapper {
+  font-family: "PT Serif",serif;
+  font-style: normal;
+  font-weight: 400;
+  color: #000;
+  background-color: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+p{
+  text-align: justify;
+  font-size: 17px;
+}
+
+
+.exchange-section {
+  padding: 20px 0px;
+  text-align: center;
+  color: #000;
+  background-repeat:no-repeat;
+  background-size:fill;
+  height:auto;width:100%; -->
+}
+
+</style>
+
+
+<div class="exchange_wrapper">
+
+  <div class="exchange-section container" >
+    <h1 style="color:#000;" >Return and Exchange policies</h1>
+  </div>
+  <br>
+
+{% comment %} ***************************heading********************************* {% endcomment %}
+  <div style="color:#000;padding: 0 150px !important"  >
+    {% for h in obj%}
+      <div class="mt-3">
+        <h3 class="mt-5" style="font-size:20px"> <b>{{h.title}}</b></h3>
+          <p class="mt-4">{{h.description|linebreaks}}</p>
+        <br>
+    </div>	
+  {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

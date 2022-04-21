@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% include "categories.html"%}
+{% if search %}
+    <h3 class="text-center mt-5">Search results for "{{ search }}"</h3>
+{% else %}
+    <h3 class="text-center">Showing All Results</h3>
+{% endif %}
+<div class="container">
+        <div class="col-md-12" style="padding-left: 10%;">
+            {% for result in results %}
+            <div style="display: inline-block;">
+                <div class="card mt-3" style="width: 18rem;">
+                  <a href="{% url 'product-detail' result.slug %}" style="text-decoration: none; color: #000;">
+                    <img class="card-img-top deal-img text-center" style="width:100%" src="{{ result.image.url }}" alt="Card image cap">
+                    <div class="card-body" style="height:200px">
+                      <p class="card-text text-center" >
+                        <strong>{{ result.product_title|truncatechars:35 }}</strong><br>
+                    </a>
+                        <div class="text-center">
+                          <strong>
+                            
+                            {%if not result.on_sale%}
+                              {%if request.user.profile.user_type == 'Retailer'%}
+                                  <p>Rs.{%if result.mobilememory_set.first.retailprice%}{{result.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{result.price|default_if_none:' ...'}}{%endif%}</p>
+                                {%else%}
+                                  <p>Rs.{%if result.mobilememory_set.first.price%}{{result.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{result.price|default_if_none:' ...'}}{%endif%}</p>
+                                {%endif%} 
+
+                              {%else%}
+                                  <p class="mb-1" style="text-decoration:line-through;font-size:17px;">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ result.specialdeals.specialdealattr_set.first.productsize.retailprice}}{%else%}{{ result.specialdeals.specialdealattr_set.first.productsize.price}}{%endif%}</p>
+                                  <p class="mb-1" id="dispercentage_{{result.id|safe}}" style="color:red;font-size:16px"></p>
+                                  <p class="mb-1">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ result.specialdeals.specialdealattr_set.first.retail_discount_price}}{%else%}{{ result.specialdeals.specialdealattr_set.first.discounted_price}}{%endif%}</p>
+                              {%endif%}
+
+                          </strong>
+                          {% comment %} <button type="button" style="background-color: #FF9900; color: #fff;" data-quantity = "1" data-product={{result.id|safe}} data-action="add" data-price="" data-color="" class="btn m-3 update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+                        </div>
+					
+                      </p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <br><br>
+            <h4 class="text-center mr-5">No results found.</h4>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+
+        {% for prod in results %}
+              {%if request.user.profile.user_type == 'Retailer'%}
+                var original_price='{{ prod.specialdeals.specialdealattr_set.first.productsize.retailprice}}';
+                var discounted='{{ prod.specialdeals.specialdealattr_set.first.retail_discount_price}}';
+              {%else%}
+                var original_price='{{ prod.specialdeals.specialdealattr_set.first.productsize.price}}';
+                var discounted='{{ prod.specialdeals.specialdealattr_set.first.discounted_price}}';
+              {%endif%}
+        
+        var original_price=original_price.replace(/,/g, '');
+        var discounted= discounted.replace(/,/g, '');
+        var discount_price = original_price - discounted;
+        var dis=((discount_price/original_price)*100).toFixed(2);;
+        //console.log(original_price,discounted,discount_price,dis);
+              $('#dispercentage_{{ prod.id|safe }}').text(dis +'%  '+  '  OFF');
+          {% endfor %}
+    
+    </script>
+{% endblock %}

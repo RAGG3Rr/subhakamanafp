@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{%block css%}
+<style>
+  #myTable_wrapper{
+    margin-top: 0px !important;
+    padding-top: 0px !important;
+  }
+</style>
+    <!-- Data Tables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+{%endblock%}
+{% block content %}
+  <div class="container  {% if password_reuse == False%}mt-3{% else %}mt-5{% endif %}">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="content-section">
+          <div class="media" style="display: flex; justify-content: center;">
+            <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+          </div>
+          <div class="media-body">
+            <h4 class="account-heading text-center">Username: {{ user.username }}</h4>
+            <p class="text-secondary text-center">{{ user.first_name }} {{ user.last_name }}</p>
+            <p class="text-secondary text-center">{{ user.email }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9">      
+        <div class="pc-tab">
+          <input type="radio" checked="checked" id="tab1" name="pct">
+          <input type="radio" name="pct" id="tab2">
+          <input type="radio" name="pct" id="tab3">
+          <nav>
+            <ul>
+              <li class="tab1">
+                <label for="tab1">My Orders <i class="fas fa-shopping-cart"></i></label>
+              </li>
+              <li class="tab2">
+                <label for="tab2">Edit Profile <i class="fas fa-user-edit"></i></label>
+              </li>
+              <li class="tab3">
+                <label for="tab3">Settings <i class="fas fa-cogs"></i></label>
+              </li>
+            </ul>
+          </nav>
+          <section>
+            <div class="tab1">
+              <div class="container pt-0 mt-0">
+                <table class="table table-hover data-table" id="myTable">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Transaction Number</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Ordered Date</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for order in customer_order %}
+                    <tr>
+                      <th scope="row">{{forloop.counter}}</th>
+                      <td>{{order.transaction_id}}</td>
+                      {% for item in order_status%}
+                        {% if item.order_id == order.id %}
+                          <td>{{item.order_status}}</td>
+                        {% endif %}
+                      {% endfor %}
+                      <td>{{order.date_ordered}}</td>
+                      <td><a href="{% url 'order-detail' order.id %}">View</a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tab2">
+              <!-- FORM HERE -->
+              <form method="POST" class="p-3" enctype="multipart/form-data">
+                {% csrf_token %}
+                <fieldset class="form-group0">
+                    <legend class="border-bottom mb-4">Profile Info</legend>
+                </fieldset>
+                {{ u_form | crispy }}
+                {{ p_form | crispy }}
+                <button type="submit" class="btn btn-primary">Update</button>
+              </form>
+            </div>
+            <div class="tab3">
+              <div class="container">
+                <h2>Settings</h2>
+                <div class="row">
+                  {% if password_reuse == True%}
+                    <div class="col-md-6">
+                      <p>Change your password.</p>
+                    </div>
+                    <div class="col-md-6">
+                      <a href="{% url 'password_change' %}"><button class="btn btn-secondary">Change Password</button></a>
+                    </div>
+                  {% else %}
+                    <div class="col-md-6">
+                      <p>Set your password.</p>
+                    </div>
+                    <div class="col-md-6">
+                      <a href="/set_password"><button class="btn btn-secondary">Set Password</button></a>
+                    </div>
+                  {% endif%}
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p>Delete your account.</p>
+                  </div>
+                  <div class="col-md-6">
+                    <button class="btn btn-danger mb-2" data-toggle="modal" data-target="#exampleModalCenter">Deactivate Account</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Deactivate Account</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to proceed?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form method="POST" action="{% url 'delete_user' request.user.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Continue</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#myTable').DataTable({
+            searching: true,
+            ordering: false,
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            // dom: '<"top">rt<"bottom"lfp><"clear">',
+        });
+    } );
+</script>
+{% endblock %}

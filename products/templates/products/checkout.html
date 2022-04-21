@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include "categories.html"%}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="box-element" id="form-wrapper">
+                <form id="form" method="POST">
+                    <div id="user-info">
+						<p>Your Information:</p>
+                        <div class="form-field">
+                            <input required class="form-control" type="text" name="firstname" placeholder="First Name..">
+                        </div>
+						<div class="form-field">
+                            <input required class="form-control" type="text" name="lastname" placeholder="Last Name..">
+                        </div>
+                        <div class="form-field">
+                            <input required class="form-control" type="email" name="email" placeholder="Email..">
+                        </div>
+						<div class="form-field">
+                            <input required class="form-control" type="integer" name="phone_no" placeholder="Contact Number..">
+                        </div>
+                    </div>
+                    <br>
+                    <div id="shipping-info">
+                        <hr>
+                        <p>Shipping Information:</p>
+                        <hr>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="address" placeholder="Address.." value='{{p_form.address|default_if_none:""}}' required>
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="city" placeholder="City.." value='{{p_form.city|default_if_none:""}}' required>
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="state" placeholder="Provience number.." value='{{p_form.state|default_if_none:""}}' required>
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="zipcode" placeholder="Zip code.." value='{{p_form.zipcode|default_if_none:""}}'>
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="number" name="phone" placeholder="Phone number" value='{{p_form.phone_no|safe}}' required>
+                        </div><br>
+                    </div>
+    
+                    <hr>
+					<div class="cover" style="display:none">
+						<i class="fa fa-spinner fa-pulse spinner_proceed"></i> 
+					</div>
+						<input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue" >
+						
+					
+                </form>
+            </div>
+    
+            <br>
+            <div class="box-element hidden" id="payment-info">
+                <h5>Payment Options</h5> <br>
+                <div class="container">
+                    <div class="row text-center">
+                        <div class="col-md-6">
+                            <a href="" data-toggle="modal" data-target="#exampleModalCenter" style="text-decoration: none; color: #000;">
+                                <img src="{% static 'images/cod.png'%}" alt="" height="100" width="100">
+                                <p>Cash on Delivery</p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="" style="text-decoration: none; color: #000;">
+                                <img src="{% static 'images/card.png'%}" alt="" height="100" width="100">
+                                <p>Pay with Card</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+			
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Cash on Delivery</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="font-size: 20px;">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Your order confirmation will be sent to your email shortly once you proceed.
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button"  class="btn btn-success" id="make-payment" onclick="cod()" data-click="cod">Proceed</button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-lg-6">
+            <div class="box-element">
+                <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+                <hr>
+                <h3>Order Summary</h3>
+                <hr>
+                {% for item in items %}
+                <div class="cart-row">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img class="row-image" src="{{ item.product.image.url }}">
+                        </div>
+                        <div class="col-md-8">
+                            <div><p style="margin:0px 0px;"><b>Product:</b> {{item.product.product_title}}
+							<p style="color:blue;margin:0px 0px;">
+								Size:  {{item.features|default_if_none:''}}
+								</p>
+								<p style="color:blue;margin:0px 0px;">
+								Color:  {{item.colors|default_if_none:''}}</p> 
+						</p></div>
+                            <div><p><b>Price:</b> Rs. {{item.price}}</p></div>
+                            <div><p><b>Quantity:</b> {{item.quantity}}</p></div>
+                        </div>
+                    </div>
+                </div><hr>
+                {% endfor %}
+                <h5>Items:   {{order.get_cart_items}}</h5>
+                <!-- <h5>Total:   Rs. {{order.get_cart_total|floatformat:2}}</h5> -->
+				<h5 style="font:weight:bold">Total:<span style="margin-left:30px;font-weight:bold;"> Rs. {{order.get_cart_total|floatformat:2}}</span></h5> 
+				<h5 style="font:weight:bold">Shipping Charges:<span style="margin-left:30px;"> Rs. {{shipping}}</span></h5> 
+                <h5>Grand Total:<span style="margin-left:30px;font-weight:bold;">   Rs. {{grand_total}}</span></h5>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    if(user != 'AnonymousUser'){
+        document.getElementById('user-info').innerHTML = '';
+    }else{
+        //document.getElementById('form-field').classList.add("hidden");
+        console.log('here');
+    }
+
+    var total = '{{order.get_cart_total|floatformat:2}}'
+
+    // var form = document.getElementById('form')
+    // csrftoken = form.getElementsByTagName("input")[0].value
+    console.log('New Token:',form.getElementsByTagName("input")[0].value);
+
+    form.addEventListener('submit', function(e){
+        e.preventDefault()
+        var mode = 'cod' ;
+        submitFormData(mode)
+        //document.getElementById('form-button').classList.add('hidden');
+        //document.getElementById('payment-info').classList.remove('hidden');
+    })
+
+    document.getElementById('make-payment').addEventListener('click', function(e){
+        var mode = document.getElementById("make-payment").getAttribute("data-click")
+        submitFormData(mode)
+    })
+
+    function submitFormData(mode){
+        var userFormData = {
+            'firstname': null,
+            'lastname': null,
+            'email':null,
+            'phone_no':null,
+            'total': total,
+        }
+
+        var shippingInfo = {
+            'address': null,
+            'city':null,
+            'state': null,
+            'zipcode': null,
+            'phone': null,
+        }
+
+        if(user == 'AnonymousUser'){
+            userFormData.firstname = form.firstname.value
+            userFormData.lastname = form.lastname.value
+            userFormData.email = form.email.value
+            userFormData.phone_no = form.phone_no.value
+            shippingInfo.address = form.address.value
+            shippingInfo.city = form.city.value
+            shippingInfo.state = form.state.value
+            shippingInfo.zipcode = form.zipcode.value
+			shippingInfo.phone = form.phone.value
+        }else{
+            shippingInfo.address = form.address.value
+            shippingInfo.city = form.city.value
+            shippingInfo.state = form.state.value
+            shippingInfo.zipcode = form.zipcode.value
+            shippingInfo.phone = form.phone.value
+        }
+		
+        var url = '/process_order/'
+		$('.cover').show();
+		$("#form-button").attr("disabled", true);
+        fetch(url, {
+            method: 'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({'form': userFormData, 'shipping': shippingInfo, 'mode' : mode})
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            //alert(data);
+            //alert('Transaction completed');  
+			
+            cart = {}
+            document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+			$('.cover').hide();
+			window.location.href = "{% url 'orderprocessing' %}"
+        })
+    }
+</script>
+{% endblock %}

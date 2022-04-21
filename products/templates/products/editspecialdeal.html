@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{%block css%}
+  <style>
+    .multiField{
+      border-top : 1px solid black;
+    }
+
+    #div_id_product{
+      display:none;
+    }
+  </style>
+{%endblock%}
+{% block content%}
+
+  <div class="addspecial">
+    <div class="container">
+      <form action="{% url 'updatedeal' pk%}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form|crispy}}
+        {{attr_form.management_form}}
+          <div class="size-form">
+            {{attr_form|crispy}}
+              <hr>
+          </div>
+        <input type="submit" class="btn btn-primary" value="Save">
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const totalform = $('#id_form-INITIAL_FORMS').val()
+    const extraform = parseInt($('#id_form-INITIAL_FORMS').val())
+    $('#id_product').find(`option[value={{pk}}]`).prop("selected", "true");
+    $('#id_product').find(`option:not(:selected)`).attr("disabled", true);
+    $(function () {
+      const getval = $("#id_product :selected").val();
+      const getsizeval = $("#id_productsize :selected").val();
+  
+      if (getval) {
+        const url = "/getspecialdeals/";
+        const getid = getval;
+        $.ajax({
+          url: url,
+          data: {
+            getid: getid,
+          },
+          success: function (data) {
+            let html_data = '<option value="">--------------</option>';
+  
+            data.forEach(function (size) {
+              html_data += `<option value="${size.id}">${size.description}</option>`;
+            });
+            for(x=0;x<totalform;x++){
+              var opt = $(`#id_form-${x}-productsize option:selected`).val() 
+              $(`#id_form-${x}-productsize`).html(html_data);
+              $(`#id_form-${x}-productsize`)
+                .find(`option[value=${opt}]`)
+                .prop("selected", "true");
+            }
+          },
+          error: function (e) {
+            console.error('!');
+          },
+        });
+      }
+    });
+
+
+    $(function () {
+      $(`#id_form-${extraform}-productsize`).click(function () {
+        console.log("hello")
+        const url = "/getspecialdeals/";
+        const getid = $("#id_product :selected").val();
+        $.ajax({
+          url: url,
+          data: {
+            getid: getid,
+          },
+          success: function (data) {
+            let html_data = '<option value="">--------------</option>';
+            data.forEach(function (size) {
+              html_data += `<option value="${size.id}">${size.description}</option>`;
+            });
+              $(`#id_form-${extraform}-productsize`).html(html_data);
+          },
+          error: function (e) {
+            console.error("!")
+          },
+        });
+      });
+    }); 
+  </script>
+{%endblock content%}

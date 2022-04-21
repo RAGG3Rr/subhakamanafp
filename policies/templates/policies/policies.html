@@ -1,0 +1,10 @@
+{% extends "base.html"%}
+{% block content %}
+<h2 class="text-center mt-3">Privacy Policies</h2>
+<div class="container mt-5">
+    {% for policy in policies%}
+    <h4 style="color: red;">{{ policy.title }}</h4>
+    <p>{{policy.content}}</p>
+    {% endfor %}
+</div>
+{% endblock %}

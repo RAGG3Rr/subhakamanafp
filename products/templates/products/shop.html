@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include "categories.html"%}
+
+<div class="container-fluid" {% if not messages%}{% if password_reuse %}style="margin-top: 65px !important"{% endif %}{% endif %}>
+  <nav aria-label="breadcrumb container">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home'%}">Home</a></li>
+      <li class="breadcrumb-item"><a href="#">{{ title }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{data}}</li>
+    </ol>
+  </nav>
+ 
+  <div class="row">
+    <div class="col-md-2">
+      <h4 class="text-center">Categories </h4>
+      <ul class="list-group mt-3 category_list" style="height: 200px; overflow-y: scroll; overflow-x: hidden;">
+        <a href="{% url 'all' %}" style="text-decoration: none; color: #000;"><li class="list-group-item {% if id == 0 %} active {% endif %}">Shop</li></a>
+        {% for products in categories %}
+          <a href="{% url 'category_detail' products.slug %}" style="text-decoration: none; color: #000;" ><li class="list-group-item {% if products.id == id %}active{% endif %}">{{ products.main_category}}</li></a>
+        {% endfor %}
+      </ul>
+      <form class="form-group mt-4" data-high-price="{% url 'high' %}" id="sort">
+        <label for="">Sort by</label>
+        <select id="inputState" class="form-control">
+          <option id="random">Random</option>
+          <option id="high">Price: High to Low</option>
+          <option id="low">Price: Low to High</option>
+          <option id="low">Recent Products</option>
+          <option id="low">Popular Products</option>
+        </select>
+      </form>
+	  <form class="form-group" data-price-range="{% url 'high' %}" id="sort">
+        <label for="">Price range</label>
+        <input type="number" class="form-control" min="0" name="minprice" placeholder="Price greater than...">
+        <input type="number" class="form-control mt-2" min="0" name="maxprice" placeholder="Price smaller than...">
+		<button class="btn btn-success mt-2" id="searchproduct">Search</button>
+      </form>
+    </div>
+    <div class="col-md-10" id="results">
+      {% for item in items %}
+      <div class="col-xl-4 col-lg-4 col-md-4" style="float:left;">
+      <div style="display: inline-block; width:100%">
+	  
+        <!-- <div class="card mt-3" style="width: 18rem; text-align:center;"> -->
+        <div class="card mt-3 cardnew" style="text-align:center;">
+          <a href="{% url 'product-detail' item.slug %}" style="text-decoration: none; color: #000;">
+            <img class="card-img-top deal-img" src="{{ item.image.url }}" alt="Card image cap">
+            <div class="card-body">
+              <div class="card-text text-center">
+                <strong>{{ item.product_title|truncatechars:45 }}</strong><br>
+          </a>
+                <div class="text-center"><strong>
+                  {%if request.user.profile.user_type == 'Retailer'%}
+                    <p>Rs.{%if item.mobilememory_set.first.retailprice%}{{item.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{item.price|default_if_none:' ...'}}{%endif%}</p>
+                  {%else%}
+                    <p>Rs.{%if item.mobilememory_set.first.price%}{{item.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{item.price|default_if_none:' ...'}}{%endif%}</p>
+                  {%endif%}
+                </strong> <br>
+                  {% if item.items_in_stock != 0 %}
+                  {% comment %} <button type="button" style="background-color: #FF9900; color: #fff;" data-quantity = "1" data-product={{item.id}} data-action="add" data-price="" data-color="" class="btn m-3 update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+                  {% else %}
+                  <p style="color: red; font-size: larger;" class="mt-4">OUT OF STOCK</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+$("#inputState").change(function(){
+  const url = $("#sort").attr("data-high-price");
+  const main_category_id = `{{ id }}`;
+  const sub_category_item = '{{ sub_category_item }}'
+  const specific_category_item = '{{ specific_category_item }}'
+
+  const check = $('#inputState').val();
+  //console.log(check);
+  $.ajax({
+      url: url,
+      data: {
+        'main_category_id': main_category_id,
+        'check': check,
+        'sub_category_item': sub_category_item,
+        'specific_category_item': specific_category_item,
+      },
+      success: function (data){
+        $('#results').empty();
+        $('#results').append($(data).find('#results').html());
+      }
+  })
+})
+</script>
+{% endblock %}

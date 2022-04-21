@@ -1,0 +1,97 @@
+{% url 'home' as home %}
+{% url 'profile' as profile %}
+{% url 'register' as register %}
+{% url 'login' as login %}
+{% url 'all_items' as all %}
+{% url 'orders' as orders %}
+{% url 'cart' as cart %}
+{% url 'blog' as blog %}
+
+{% load static %}
+<style>
+.navmenu{
+	text-transform:uppercase
+	}
+</style>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top p-0">
+    <!-- <div class="col-sm-12 topnavbar">
+		<span style="color:white;"> Contact us | </span>
+		<span style="color:white;"> About us | </span>
+	</div> -->
+	
+	<a class="navbar-brand pt-0 pb-0" href="{% url 'home'%}">
+        <img src="{% static 'images/logo.png' %}" class="logo" alt="logo">
+    </a>
+	
+    <div class="wrap">
+		
+      <form method="POST" action="{% url 'search'%}">
+        {% csrf_token %}
+          <div class="search">
+		  <!-- <select class="form-control">
+			<option>Select Categories</option>
+		</select> -->
+           <input type="text" class="form-control searchTerm" placeholder="What are you looking for?" name="search" id="search" required>
+            <button type="submit" class="searchButton">
+             <i class="fa fa-search"></i>
+            </button>
+          </div>
+      </form>
+    </div>
+    
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse float-right" id="navbarNavDropdown">
+    <ul class="navbar-nav ml-auto">
+      {% if user.is_authenticated %}
+      <li class="navmenu nav-item {% if request.path == home %} active {%endif%}">
+        <a class="nav-link" href="{% url 'home' %}">Home</a>
+      </li>
+        {% if user.is_superuser %}
+        {% comment %} <li class="navmenu nav-item {% if request.path == all %} active {%endif%}">
+          <a class="nav-link" href="{% url 'all_items' %}">All</a>
+        </li>
+        <li class="navmenu nav-item {% if request.path == orders %} active {%endif%}">
+          <a class="nav-link" href="{% url 'orders' %}">Orders</a>
+        </li> {% endcomment %}
+        <li class="navmenu nav-item dropdown {% if request.path == all %}active{%elif request.path == orders%} active {%endif%}">
+          <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Admin <i class="fas fa-sort-down" style="position:absolute;top:10px"></i>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'all_items' %}">Add Product</a>
+            <a class="dropdown-item" href="{% url 'specaildeal' %}">Special Deals</a>
+            <a class="dropdown-item" href="/admin/">Admin Panel</a>
+            <a class="dropdown-item" href="{% url 'orders' %}">Orders</a>
+
+          </div>
+        </li>
+        {% endif %}
+        {% comment %} <li class="navmenu nav-item {% if request.path == blog %} active {%endif%}">
+            <a class="nav-link" href="{% url 'blog' %}">Blog</a>
+         </li> {% endcomment %}
+      <li class="navmenu nav-item {% if request.path == profile %} active {%endif%}">
+        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+      </li>
+      <li class="navmenu nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+      </li>
+      {% else %}
+      <li class="navmenu nav-item {% if request.path == register %} active {%endif%}">
+        <a class="nav-link" href="{% url 'register' %}">Register</a>
+      </li>
+      <li class="navmenu nav-item {% if request.path == login %} active {%endif%}">
+        <a class="nav-link" href="{% url 'login' %}">Login</a>
+      </li>      
+      {% endif %}
+      <div class="form-inline my-2 my-lg-0 nav_cart">        
+        <a href="{% url 'cart' %}">
+          <i  id="cart-icon" class="fas fa-shopping-cart"></i>
+        </a>
+       <p id="cart-total">{{cartItems}}</p>
+      </div>
+    </ul>
+  </div>
+  
+</nav>

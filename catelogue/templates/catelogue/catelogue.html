@@ -1,0 +1,41 @@
+{% extends "base.html" %} {% load static %} {% block content %} 
+    
+<div class="container my-3">
+  {%if catelogue %}
+      <h2 class="text-center mb-4">CATALOGUE</h2>
+      <ul class="nav catelogue nav-tabs">
+      {%for catelogue in catelogue%}
+        <li class="my-3">
+          <a data-toggle="tab" class="catelogue_layout {%if forloop.counter == 1%} active {%endif%}" href="#id{{catelogue.id}}">{{catelogue.name}}</a>
+        </li>
+      {% endfor %}
+      </ul>
+      <div class="row">
+        <div class="col">
+          <div class="tab-content catelogue_layout">
+          {%for catelogue in catelogue%}
+          
+              <div id="id{{catelogue.id}}" class="tab-pane fade {%if forloop.counter == 1%} active show {%endif%}">
+                <h3 style="">{{catelogue.name}}</h3>
+                <h6>
+                  {{catelogue.description}}
+                </h6>
+                  {% if catelogue.file %}
+                <h6>
+                  <iframe src="{{catelogue.file.url|safe}}" style="width: 100%; height: 500px;" frameborder="0" scrolling="yes">
+						
+				  </iframe>
+                    
+                </h6>
+                {% endif %}
+              </div>
+          {% endfor %}
+          </div>
+        {%else%}
+            <h3>Currently, No catalogue available.</h3>
+        {%endif%}
+      </div> 
+    </div>
+  </div>
+{%endblock content%}
+

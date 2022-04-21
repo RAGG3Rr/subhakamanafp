@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include "categories.html"%}
+<h3 class="text-center {% if password_reuse == False%}mt-3{% else %}mt-5{% endif %}" >{{ title }}</h3>
+{% if check == 'sale'%}
+<div class="container">
+  <div class="row">
+      <div class="col-md-12" style="padding-left: 10%;">
+          {% for deal in special_deals %}
+              <div style="display: inline-block;">
+                  <div class="card mt-3" style="width: 18rem;">
+                    <a href="{% url 'product-detail' deal.product.slug %}" style="text-decoration: none; color: #000;">
+                      <img class="card-img-top deal-img w-100" src="{{ deal.product.image.url }}" alt="Card image cap">
+                      <div class="card-body">
+                        <p class="card-text text-center">
+						
+                          <strong>{{ deal.product.product_title|truncatechars:35 }}</strong><br>
+                      </a>
+                          <div class="text-center">
+                            <p style="text-decoration:line-through;font-size:17px;">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ deal.specialdealattr_set.first.productsize.retailprice}}{%else%}{{ deal.specialdealattr_set.first.productsize.price}}{%endif%}</p>
+                              <p id="dispercentage_{{deal.id|safe}}" style="color:red;font-size:16px"></p>
+                              <p>Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ deal.specialdealattr_set.first.retail_discount_price}}{%else%}{{ deal.specialdealattr_set.first.discounted_price}}{%endif%}</p>
+                            {% comment %} <button type="button" style="background-color: #FF9900; color: #fff;" data-quantity = "1" data-product={{deal.product.id}} data-feature={{deal.product.mobilememory_set.first.id}} data-action="add" data-price="" data-color="" class="btn update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+                          </div>
+                        </p>
+                      </div>
+                  </div>
+              </div>
+          {% endfor %}
+      </div>
+  </div>
+</div>
+{%elif check == "productrel"%}
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-12" style="padding-left: 10%;">
+          {% for deal in special_deals %}
+              <div style="display: inline-block;">
+                  <div class="card mt-3 cardnew" style="width:18rem;text-align:center;">
+                    <a href="{% url 'product-detail' deal.product.slug %}" style="text-decoration: none; color: #000;">
+					
+                      <img class="card-img-top homepage-img" src="{{ deal.product.image.url }}" alt="Card image cap">
+                      <div class="card-body">
+                        <p class="card-text text-center">
+						<p class="card-title text-center" data-toggle="tooltip" data-placement="top" title='{{deal.product.product_title}}'>{{deal.product.product_title|truncatechars:35 }}</p>
+                          <!-- <strong>{{ deal.product_title|truncatechars:15 }}</strong><br> -->
+                      </a>
+                          <div class="text-center"><strong>
+                            {%if request.user.profile.user_type == 'Retailer'%}
+                              <p>Rs.{%if deal.product.mobilememory_set.first.retailprice%}{{deal.product.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{deal.product.price|default_if_none:' ...'}}{%endif%}</p>
+                            {%else%}
+                              <p>Rs.{%if deal.product.mobilememory_set.first.price%}{{deal.product.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{deal.product.price|default_if_none:' ...'}}{%endif%}</p>
+                            {%endif%}</strong> <br><br>
+                            {% comment %} <button type="button" style="background-color: #FF9900; color: #fff;" data-quantity = "1" data-product={{deal.id}} data-action="add" data-feature={{deal.mobilememory_set.first.id}} data-price="" data-color="" class="btn update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+                          </div>
+                        </p>
+                      </div>
+                  </div>
+              </div>
+          {% endfor %}
+      </div>
+  </div>
+</div>
+{% else %}
+<div class="container">
+  <div class="row">
+      <div class="col-md-12" style="padding-left: 10%;">
+          {% for deal in special_deals %}
+              <div style="display: inline-block;">
+                  <div class="card mt-3 cardnew" style="width:18rem;text-align:center;">
+                    <a href="{% url 'product-detail' deal.slug %}" style="text-decoration: none; color: #000;">
+					
+                      <img class="card-img-top homepage-img" src="{{ deal.image.url }}" alt="Card image cap">
+                      <div class="card-body">
+                        <p class="card-text text-center">
+						<p class="card-title text-center" data-toggle="tooltip" data-placement="top" title='{{deal.product_title}}'>{{deal.product_title|truncatechars:35 }}</p>
+                          <!-- <strong>{{ deal.product_title|truncatechars:15 }}</strong><br> -->
+                      </a>
+                          <div class="text-center"><strong>
+                            {%if request.user.profile.user_type == 'Retailer'%}
+                              <p>Rs.{%if deal.mobilememory_set.first.retailprice%}{{deal.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{deal.price|default_if_none:' ...'}}{%endif%}</p>
+                            {%else%}
+                              <p>Rs.{%if deal.mobilememory_set.first.price%}{{deal.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{deal.price|default_if_none:' ...'}}{%endif%}</p>
+                            {%endif%}</strong> <br><br>
+                            {% comment %} <button type="button" style="background-color: #FF9900; color: #fff;" data-quantity = "1" data-product={{deal.id}} data-action="add" data-feature={{deal.mobilememory_set.first.id}} data-price="" data-color="" class="btn update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+                          </div>
+                        </p>
+                      </div>
+                  </div>
+              </div>
+          {% endfor %}
+      </div>
+  </div>
+</div>
+
+{% endif %}
+<script type="text/javascript">
+
+  $(function() {
+    {% for special_deal in special_deals %}
+          {%if request.user.profile.user_type == 'Retailer'%}
+            var original_price='{{ special_deal.specialdealattr_set.first.productsize.retailprice}}';
+            var discounted='{{ special_deal.specialdealattr_set.first.retail_discount_price}}';
+          {%else%}
+            var original_price='{{ special_deal.specialdealattr_set.first.productsize.price}}';
+            var discounted='{{ special_deal.specialdealattr_set.first.discounted_price}}';
+          {%endif%}
+    
+    var original_price=original_price.replace(/,/g, '');
+    var discounted= discounted.replace(/,/g, '');
+    var discount_price = original_price - discounted;
+    var dis=((discount_price/original_price)*100).toFixed(2);;
+    //console.log(original_price,discounted,discount_price,dis);
+          $('#dispercentage_{{ special_deal.id|safe }}').text(dis +'%  '+  '  OFF');
+      {% endfor %}
+  });
+
+</script>
+
+
+{% endblock %}

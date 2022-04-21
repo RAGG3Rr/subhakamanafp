@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content%}
+{% include "categories.html"%}
+<div class="container" {% if not messages%}{% if password_reuse %}style="margin-top: 65px !important;"{% endif %}{% endif %}>
+    <div class="row">
+	
+        <div class="col-md-4 text-center big-screen"> 
+			<div class="undeal-img">
+            <img id="main_img" src="{{ product.image.url }}" alt="" >
+			</div>
+                <div class="row">
+                    <div class="col-md-12 p-3 display-img" style="max-width: 960px;">
+                        <img id="thumb_img" src="{{ product.image.url }}" style="horizontal-align: center;" alt="">
+                        {% for pi in product.productimage_set.all %}
+                        <img id="thumb_img" src="{{ pi.image.url }}"  class="img-fluid" alt="">
+                        {% endfor %}
+                    </div>
+                </div>
+			
+            {% if product.items_in_stock != 0 %}
+            <button type="submit" style="background-color: #FF9900; color: #fff;" id="cart-detail-btn" data-discount="{{special_deal.specialdealattr_set.first.id}}" data-product={{product.id|safe}} data-action="add" data-quantity = "1" data-price="" data-feature={{features.first.id}} data-user={%if request.user.is_authenticated%}{{request.user.profile.user_type}}{%else%}'Normal'{%endif%} data-color="" class="btn m-3 update-cart"><i id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h2>{{ product.product_title }}</h2>
+            <div class="avg-rating-stars">
+                <i class="fa fa-star {% if avg_rating < 1 or avg_rating == null %} empty {% endif %} fa-2x"></i>
+                <i class="fa fa-star {% if avg_rating < 2 or avg_rating == null %} empty {% endif %} fa-2x"></i>
+                <i class="fa fa-star {% if avg_rating < 3 or avg_rating == null %} empty {% endif %} fa-2x"></i>
+                <i class="fa fa-star {% if avg_rating < 4 or avg_rating == null %} empty {% endif %} fa-2x"></i>
+                <i class="fa fa-star {% if avg_rating < 5 or avg_rating == null %} empty {% endif %} fa-2x"></i>
+            </div><br>
+            {% if product.items_in_stock == 0 %}
+            <h4 style="color: red;">OUT OF STOCK</h4>
+            {% endif %}
+			
+				{% if special_deal %}
+                {%if request.user.profile.user_type == "Retailer"%}
+                    <span style="text-decoration:line-through; font-size: 25px;"><span class="currencysymbol">Rs. </span><span class="original_price">{{ special_deal.specialdealattr_set.first.productsize.retailprice|default_if_none:'' }}</span></span> 
+                    <span class = "ml-2" style="font-size: 25px"><span class="currencysymbol">Rs. </span><span class="discount_price">{{ special_deal.specialdealattr_set.first.retail_discount_price|default_if_none:'' }}</span></span>
+                {%else%}
+                    <span style="text-decoration:line-through; font-size: 25px;"><span class="currencysymbol">Rs. </span><span class="original_price">{{ special_deal.specialdealattr_set.first.productsize.price|default_if_none:'' }}</span></span> 
+                    <span class = "ml-2" style="font-size: 25px"><span class="currencysymbol">Rs. </span><span class="discount_price">{{ special_deal.specialdealattr_set.first.discounted_price|default_if_none:'' }}</span></span>
+                {%endif%}
+                <br><span id="dispercentage" style="color:red;font-size:16px"></span>
+                <div class="row" style="text-decoration: none;" >
+					<div class="col" id="selectfeature" style="">
+						<div style="font-size:18px;color:blue;display:inline-flex" > <span>Select Sizes: </span>
+                            <span class="ml-2" style="width:300px">
+							<select class="col-sm-8 form-control" id="dispfeatures" >
+							{% for obj in special_deal.specialdealattr_set.all %}
+								<option value="{{obj.productsize_id|safe}}" style="font-size: 22px;    padding: 5px;">{{obj.productsize.description|safe}}</option>
+							{% endfor %}
+							</select>
+                        </span>
+                    </div>
+					</div>
+				</div><br>
+                <div class="row" style="text-decoration: none;" >
+					<div class="col" id="selectcolor" style="display:none;">
+						<div style="font-size:18px;color:blue;display:inline-flex" > <span>Available Colors: </span>
+                            <span class="ml-2" style="width:300px">
+							<select class="col-sm-8 form-control" id="productcolors" >
+							{% for obj in color %}
+								<option value="{{obj.id|safe}}" style="font-size: 22px;    padding: 5px;">{{obj.name|safe}}</option>
+							{% endfor %}
+							</select>
+                        </span>
+                    </div>
+					</div>
+				</div>
+                <hr>
+				{% else %}
+				
+				<div class="row" style="text-decoration: none;" >
+					<div class="col" id="selectfeature" style="display:none;">
+						<div style="font-size:18px;color:blue;display:inline-flex" > <span>Select Sizes: </span>
+                            <span class="ml-2" style="width:300px">
+							<select class="col-sm-8 form-control" id="dispfeatures" >
+							{% for obj in features %}
+								<option value="{{obj.id|safe}}" style="font-size: 22px;    padding: 5px;">{{obj.description|safe}}</option>
+							{% endfor %}
+							</select>
+                        </span>
+                    </div>
+					</div>
+				</div><br>
+                <div class="row" style="text-decoration: none;" >
+					<div class="col" id="selectcolor" style="display:none;">
+						<div style="font-size:18px;color:blue;display:inline-flex" > <span>Available Colors: </span>
+                            <span class="ml-2" style="width:300px">
+							<select class="col-sm-8 form-control" id="productcolors" >
+							{% for obj in color %}
+								<option value="{{obj.id|safe}}" style="font-size: 22px;    padding: 5px;">{{obj.name|safe}}</option>
+							{% endfor %}
+							</select>
+                        </span>
+                    </div>
+					</div>
+				</div>
+					<hr>
+					<p  style="font-size:22px;font-weight:bold;" >Rs.<span id="featured"></span></p>
+                    <h4 id="original" style="display:block;"><span class="currencysymbol">Rs. </span><span class="original_price">{{ product.price|default_if_none:'' }}</span></h4>
+				
+				{% endif %} <br>
+				
+            
+            <span class="quantity-block mt-2">
+                <button type="button" onclick= "subtract()" name="minus" class="minus-btn">-</button>
+                <!-- <input type="number" onchange="checkStock()" id="askedQuantity" min="1" value="1" name="quantity" class="qty-input"> -->
+                <input type="number" id="askedQuantity" min="1" value="1" name="quantity" class="qty-input">
+                <button type="button" onclick= "add()" name="plus" class="plus-btn">+</button>
+            </span> <br><br>
+            <p id="para" style="color: red;"></p>
+            {%if request.user.profile.user_type == "Retailer"%}
+                <p style="font-size:20px"><b>Total price:</b><span  class="total_cart_price pl-2">{%if special_deal%}{{ special_deal.specialdealattr_set.first.retail_discount_price|default_if_none:'' }}{%else%}{{ product.mobilememory_set.first.retailprice|default_if_none:'' }}{%endif%}</span> </p>
+                {%else%}
+                <p style="font-size:20px"><b>Total price:</b><span  class="total_cart_price pl-2">{%if special_deal%}{{ special_deal.specialdealattr_set.first.discounted_price|default_if_none:'' }}{%else%}{{ product.mobilememory_set.first.price|default_if_none:'' }}{%endif%}</span> </p>
+            {%endif%}
+            {%if product.description%}
+            <h5><strong>Description</strong></h5>
+            <span class="paragraph">{{product.description|safe|linebreaks}}</span>
+            {%endif%}
+        </div>
+    </div><hr>
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="text-center">Overall Customer Satisfaction</h4>
+            <p class="text-center" style="font-size: 100px;"><span style="color: green;">{{avg_rating}}</span><strong style="color: grey;">/5</strong></p>
+        </div>
+        <div class="col-md-6">
+            <h4 class="review-title">Write Your Review</h4>
+            <p class="text-muted small">Your email address will not be published.</p>
+            <form class="review-form" action="{% url 'product-detail' product.slug|safe %}" method="post" id="review-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea class="form-control comment" name="comment" id="reviewPost" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="input-rating">
+                        <strong class="text-uppercase">Your Rating: </strong><br>
+                        <div class="stars">
+                            <input type="radio" class="rateStar" id="star5" name="rate" value="5" /><label for="star5"></label>
+                            <input type="radio" class="rateStar" id="star4" name="rate" value="4" /><label for="star4"></label>
+                            <input type="radio" class="rateStar" id="star3" name="rate" value="3" /><label for="star3"></label>
+                            <input type="radio" class="rateStar" id="star2" name="rate" value="2" /><label for="star2"></label>
+                            <input type="radio" class="rateStar" id="star1" name="rate" value="1" /><label for="star1"></label>
+                        </div>
+                    </div>
+                </div>
+
+                {% if user.id is not None %}
+                    <button class="btn btn-dark">Submit</button>
+                {% else %}
+                    You must be logged in to post a review.
+                {% endif %}
+            </form>
+        </div>
+    </div><hr>
+    <fieldset>
+        <legend class="review-start"><h4 class="review-title">Reviews</h4></legend>
+            <div id="start-review">
+                {% for review in reviews %}
+                    <div class="product-reviews">
+                        <div class="single-review">
+                            <div class="review-heading">
+                                <div><a href="#"><i class="fa fa-user"></i> @{{ review.user.username }}</a> </div>
+                                <div><a href="#"><i class="fa fa-clock"></i> {{ review.date_posted }}</a></div>
+                                <div class="review-rating pull-right">
+                                    <i class="fa fa-star {% if review.rating < 1 %} empty {% endif %}"></i>
+                                    <i class="fa fa-star {% if review.rating < 2 %} empty {% endif %}"></i>
+                                    <i class="fa fa-star {% if review.rating < 3 %} empty {% endif %}"></i>
+                                    <i class="fa fa-star {% if review.rating < 4 %} empty {% endif %}"></i>
+                                    <i class="fa fa-star {% if review.rating < 5 %} empty {% endif %}"></i>
+                                </div>
+                            </div>
+                            <div class="review-body">
+                                <p>{{ review.review }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                <p class="review-title text-center mt-5 no-review">No reviews yet!</p>
+                {% endfor %}
+            </div>
+    </fieldset>
+    <!-- Related Items -->
+  {% if related_items %}
+  <section class="deals mt-2">
+    <div class="card mx-3" style="background-color: transparent; border: none;">
+        <div class="row pt-3 pr-3 pl-3 pb-0">
+            <div class="col-md-12">
+                <div class="card-title"><h5>You may also like these...</h5></div> 
+            </div>
+            <div class="clear-fix"></div>
+        </div><hr>
+        <div class="owl-carousel" id="owl-example-next">
+          {% for item in related_items %} 
+            <div class="card ml-3 item">
+              <a href="{% url 'product-detail' item.slug %}" class="deal-product">
+			  <div class="newscale">
+                <img class="card-img-top img-fluid homepage-img" src="{{ item.image.url }}" alt="Card image cap">
+			  </div>
+                <div class="card-body text-center">
+				<p class="card-title" data-toggle="tooltip" data-placement="top" title="{{item.product_title}}">{{item.product_title|truncatechars:35 }}</p>
+                  <br>
+                  {%if not product.on_sale%}
+                    {%if request.user.profile.user_type == 'Retailer'%}
+                        <p style="font-size:16px">Rs.{%if item.mobilememory_set.first.retailprice%}{{item.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{item.price|default_if_none:' ...'}}{%endif%}</p>
+                        {%else%}
+                        <p style="font-size:16px">Rs.{%if item.mobilememory_set.first.price%}{{item.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{item.price|default_if_none:' ...'}}{%endif%}</p>
+                        {%endif%}
+                    {%else%}
+                    <p class="mb-1" style="text-decoration:line-through;font-size:17px;">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ item.specialdeals.specialdealattr_set.first.productsize.retailprice}}{%else%}{{ item.specialdeals.specialdealattr_set.first.productsize.price}}{%endif%}</p>
+                    <p class="mb-1" id="relateddispercentage_{{item.specialdeals.id|safe}}" style="color:red;font-size:16px"></p>
+                    <p class="mb-1">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ item.specialdeals.specialdealattr_set.first.retail_discount_price}}{%else%}{{ item.specialdeals.specialdealattr_set.first.discounted_price}}{%endif%}</p>
+                    {%endif%}
+              </a>
+              </div>
+          </div>
+          {% endfor %}
+        </div>
+  </section>
+  {% endif %}
+</div>
+
+<script type="text/javascript">
+    function getdiscountPercent(org,dis){
+        {%if request.user.profile.user_type == 'Retailer'%}
+        var original_price='{{ special_deal.specialdealattr_set.first.productsize.retailprice}}';
+        var discounted='{{ special_deal.specialdealattr_set.first.retail_discount_price}}';
+        {%else%}
+            var original_price='{{ special_deal.specialdealattr_set.first.productsize.price}}';
+            var discounted='{{ special_deal.specialdealattr_set.first.discounted_price}}';
+        {%endif%}
+
+        if (org){
+            original_price = org
+        }
+
+        if (dis){
+            discounted = dis
+        }
+        var original_price=original_price.replace(/,/g, '');
+        var discounted= discounted.replace(/,/g, '');
+        var discount_price=(original_price-discounted);
+        var dis=((discount_price/original_price)*100).toFixed(2);;
+        $('#dispercentage').text(dis +'% OFF');
+    }
+
+    $(document).ready(function () {
+			
+        
+            getdiscountPercent()
+
+			$('#selectfeature').hide();
+			col=('{{color}}');
+			{% for obj in features %}
+				if ({{obj.product_id|safe}} == {{product.id|safe}}){
+					$('#selectfeature').show();
+					$('#dispfeatures').show();
+					$('#featured').show();
+					$('#original').hide();
+                    {%if request.user.profile.user_type == "Retailer"%}
+                        $('#featured').html('{{features.all.0.retailprice}}');
+                    {%else%}
+                        $('#featured').html('{{features.all.0.price}}');
+                    {%endif%}
+				}
+				else{
+					$('#original').show();
+					$('#selectfeature').hide();
+					$('#dispfeatures').hide();
+					$('#featured').hide();
+				}
+			{% endfor %}
+			
+			if (col.length >= 3){
+				$('#selectcolor').show();
+				document.getElementById("cart-detail-btn").setAttribute("data-color", '{{color.0.id}}');
+			}
+			else{
+				$('#selectcolor').hide();
+			}
+    });
+
+
+    {%if special_deal%}
+        $('#dispfeatures').change(function(){
+            var mem = $(this).val();
+            {% for obj in special_deal.specialdealattr_set.all %}
+                if ({{obj.productsize_id|safe}} == mem ){
+                        {%if request.user.profile.user_type == "Retailer"%}
+                        
+                                $('.original_price').text('{{ obj.productsize.retailprice}}')
+                                $('#featured').text('{{obj.retail_discount_price}}');
+                                $(".total_cart_price").text('{{obj.retail_discount_price}}');
+                                $('.discount_price').text('{{obj.retail_discount_price}}')
+                                $('#askedQuantity').val("1")
+                                getdiscountPercent({{ obj.productsize.retailprice}},{{obj.retail_discount_price}})
+                                document.getElementById("cart-detail-btn").setAttribute("data-discount", {{obj.id}});
+                        {%else%}
+                            var pp='{{obj.price|safe}}';
+                            $('.original_price').text('{{ obj.productsize.price}}')
+                            $('#featured').text('{{obj.discounted_price}}');
+                            $(".total_cart_price").text('{{obj.discounted_price}}');
+                            $('.discount_price').text('{{obj.discounted_price}}')
+                            getdiscountPercent("{{ obj.productsize.price}}","{{obj.discounted_price}}")
+                            $('#askedQuantity').val("1")
+                            document.getElementById("cart-detail-btn").setAttribute("data-discount", {{obj.id}});
+                        {%endif%}
+                    }
+                {%endfor%}
+               
+                document.getElementById("cart-detail-btn").setAttribute("data-feature", mem);
+        })
+    {%else%}
+        $('#dispfeatures').change(function(){
+            var mem = $(this).val();
+            {% for obj in features %}
+                if ({{obj.id|safe}} == mem ){
+                    {%if request.user.profile.user_type == "Retailer"%}
+                        var pp='{{obj.retailprice|safe}}';
+                        $('#featured').text('{{obj.retailprice}}');
+                        $(".total_cart_price").text('{{obj.retailprice}}');
+                        $('#askedQuantity').val("1")
+                    {%else%}
+                        var pp='{{obj.price|safe}}';
+                        $('#featured').text('{{obj.price}}');
+                        $(".total_cart_price").text('{{obj.price}}');
+                        $('#askedQuantity').val("1")
+                    {%endif%}
+                }
+            {% endfor %}
+            document.getElementById("cart-detail-btn").setAttribute("data-price", pp);
+            document.getElementById("cart-detail-btn").setAttribute("data-feature", mem);
+        });
+    {%endif%}
+
+$('#productcolors').change(function(){
+	var mem = $(this).val();
+
+    document.getElementById("cart-detail-btn").setAttribute("data-color", mem);
+});	
+
+$('#dispcolors').change(function(){
+	var colorvalue = $(this).find(':selected').data('name');
+	
+	document.getElementById("cart-detail-btn").setAttribute("data-color", colorvalue);
+});
+	
+    $('#askedQuantity').on('change', function() {
+        var quantity = document.getElementById('askedQuantity').value;
+        document.getElementById("cart-detail-btn").setAttribute("data-quantity", quantity);
+        
+    });
+
+    $('.plus-btn').click(function(){
+        getTotalPrice()
+    })
+    $('.minus-btn').click(function(){
+        getTotalPrice()
+    })
+
+    function getTotalPrice(){
+        {%if special_deal%}
+            val_product = $('.discount_price').html()
+        {%else%}
+            val_product = $('#featured').html()
+        {%endif%}
+        a=val_product.replace(/\,/g,'')
+        val_product=Number(a)
+        asked= $('#askedQuantity').val()
+        total_val = (val_product * asked)
+        $('.total_cart_price').html(total_val.toFixed(2))
+    }
+
+    function checkStock(){
+        var quantity = document.getElementById('askedQuantity').value;
+        var quantity_asked = parseInt(quantity);
+        var quantity_stock = `{{ product.items_in_stock }}`;
+        var quantity_available = parseInt(quantity_stock);
+        document.getElementById('para').innerHTML= "";
+
+    }
+
+    function add(){
+        var quantity = document.getElementById('askedQuantity').value;
+        var quantity_asked = parseInt(quantity);
+        var quantity_available = `{{ product.items_in_stock }}`;
+
+        var change = quantity_asked + 1;
+        if (change >quantity_available){
+            $('#para').text("Item in stock is only {{product.items_in_stock }}. So cannot exceed this quantity.")
+        }
+        else{
+            document.getElementById('askedQuantity').value = change;
+            quantity = change;
+            document.getElementById("cart-detail-btn").setAttribute("data-quantity", quantity);
+        }
+        
+    }
+    function subtract(){
+        var quantity = document.getElementById('askedQuantity').value;
+
+        var quantity_asked = parseInt(quantity);
+        var quantity_available = `{{ product.items_in_stock }}`;
+        document.getElementById('para').innerHTML= "";
+
+        var change = quantity_asked - 1;
+        document.getElementById('askedQuantity').value = change;
+
+        if (quantity_asked <= quantity_available){
+            if(change == 0){
+                var change = 1;
+            }
+            document.getElementById('askedQuantity').value = change;
+            quantity = change;
+            document.getElementById("cart-detail-btn").setAttribute("data-quantity", quantity);
+        }
+        if(quantity_asked <= 1){
+            document.getElementById('askedQuantity').value = 1;
+        }
+    }
+
+
+    {% for item in related_items %}
+        {%if request.user.profile.user_type == 'Retailer'%}
+          var original_price='{{ item.specialdeals.specialdealattr_set.first.productsize.retailprice}}';
+          var discounted='{{ item.specialdeals.specialdealattr_set.first.retail_discount_price}}';
+        {%else%}
+          var original_price='{{ item.specialdeals.specialdealattr_set.first.productsize.price}}';
+          var discounted='{{ item.specialdeals.specialdealattr_set.first.discounted_price}}';
+        {%endif%}
+  
+        var original_price=original_price.replace(/,/g, '');
+        var discounted= discounted.replace(/,/g, '');
+        var discount_price = original_price - discounted;
+        var dis=((discount_price/original_price)*100).toFixed(2);
+        //console.log(original_price,discounted,discount_price,dis);
+        $('#relateddispercentage_{{ item.specialdeals.id|safe }}').text(dis +'%  '+  '  OFF');
+    {% endfor %}
+</script>
+{% endblock %}

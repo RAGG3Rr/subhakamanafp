@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include "categories.html"%}
+
+<div class="container-fluid" {% if not messages%}{% if password_reuse %}style="margin-top: 65px !important"{% endif %}{% endif %}>
+  <nav aria-label="breadcrumb container">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home'%}">Home</a></li>
+      <li class="breadcrumb-item"><a href="#">{{ title }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{data}}</li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-md-2">
+      <h4 class="text-center">Categories</h4>
+      <ul class="list-group mt-3 category_list" style="height: 200px; overflow-y: scroll; overflow-x: hidden;">
+        <a href="{% url 'all' %}" style="text-decoration: none; color: #000;"><li class="list-group-item {% if id == 0 %} active {% endif %}">Shop</li></a>
+        {% for products in categories %}
+          <a href="{% url 'category_detail' products.slug %}" style="text-decoration: none; color: #000;" ><li class="list-group-item {% if products.id|safe == id %}active{% endif %}">{{ products.main_category}}</li></a>
+        {% endfor %}
+      </ul>
+      <form class="form-group mt-4" data-high-price="{% url 'high' %}" id="sort">
+        <label for="">Sort by</label>
+        <select id="inputState" class="form-control">
+          <option id="random">Random</option>
+          <option id="high">Price: High to Low</option>
+          <option id="low">Price: Low to High</option>
+		  <option id="recent">Recent Products</option>
+          <option id="popular">Popular Products</option>
+        </select>
+      </form>
+      <form >
+        <div class="form-check my-2">
+          <input class="form-check-input" type="checkbox" value="" id="onsalefilter">
+          <label class="form-check-label" for="onsalefilter">
+            Product on Sale
+          </label>
+        </div>
+      </form>
+	  <!-- <form class="form-group" data-price-range="{% url 'pricerange' %}" id="pricerange"> -->
+	  <form class="form-group" action="{% url 'pricerange' %}" >
+        <label for="">Price range</label>
+        <input type="number" class="form-control" min="0" name="minprice" id="minprice" placeholder="Price greater than...">
+        <input type="number" class="form-control mt-2" min="0" name="maxprice" id="maxprice" placeholder="Price smaller than...">
+		
+        <input type="hidden" name="main_category_id" value="{{ id }}">
+        <input type="hidden" name="sub_category_item" value="{{ sub_category_item }}">
+        <input type="hidden" name="specific_category_item" value="{{ specific_category_item }}">
+        <input type="hidden" name="title" value="{{ title }}">
+		<button class="btn btn-success mt-2" id="searchproduct">Search</button>
+      </form>
+    </div>
+    <div class="col-md-10" id="results">
+      {% for item in items %}
+      <div class="col-xl-4 col-lg-4 col-md-4" style="float:left;">
+      <div style="display: inline-block; width:100%">
+	  
+        <!-- <div class="card mt-3" style="width: 18rem; text-align:center;"> -->
+        <div class="card mt-3 cardnew" style="text-align:center;">
+          <a href="{% url 'product-detail' item.slug %}" style="text-decoration: none; color: #000;">
+            <img class="card-img-top homepage-img" src="{{ item.image.url }}" alt="Card image cap">
+            <div class="card-body">
+              <div class="card-text text-center">
+			  <p class="card-title text-center" data-toggle="tooltip" data-placement="top" title='{{item.product_title}}'>{{item.product_title|truncatechars:45 }}</p>
+                <!-- <strong>{{ item.product_title|truncatechars:20 }}</strong> -->
+          </a>
+                <div class="text-center"><strong>
+                  {%if not onsale == "sale" %}
+                    {%if request.user.profile.user_type == 'Retailer'%}
+                        <p>Rs.{%if item.mobilememory_set.first.retailprice%}{{item.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{item.price|default_if_none:' ...'}}{%endif%}</p>
+                      {%else%}
+                        <p>Rs.{%if item.mobilememory_set.first.price%}{{item.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{item.price|default_if_none:' ...'}}{%endif%}</p>
+                      {%endif%} 
+
+                    {%else%}
+                        <p class="mb-1" style="text-decoration:line-through;font-size:17px;">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ item.specialdeals.specialdealattr_set.first.productsize.retailprice}}{%else%}{{ item.specialdeals.specialdealattr_set.first.productsize.price}}{%endif%}</p>
+                        <p class="mb-1" id="dispercentage_{{item.specialdeals.id|safe}}" style="color:red;font-size:16px"></p>
+                        <p class="mb-1">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ item.specialdeals.specialdealattr_set.first.retail_discount_price}}{%else%}{{ item.specialdeals.specialdealattr_set.first.discounted_price}}{%endif%}</p>
+                  {%endif%}
+                </strong> <br>
+                  {% if item.items_in_stock != 0 %}
+                  {% comment %} <button type="button" style="background-color: #FF9900; color: #fff;" data-quantity = "1" data-product={{item.id|safe}} data-action="add" data-feature={{item.mobilememory_set.first.id}} data-price="" data-color="" class="btn m-3 update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+                  {% else %}
+                  <p style="color: red; font-size: larger;" class="mt-4">OUT OF STOCK</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+
+$('#searchproduct').on('click',function(){
+	const minprice=$('#minprice').val();
+	const maxprice=$('#maxprice').val();
+	
+	if ((minprice == '') && (maxprice =='')){
+		alert('Please select proper price range');
+	}
+	else{   
+			//alert('else condition');
+			$('#pricerange').submit();
+	    
+	}
+});
+
+$("#onsalefilter").change(function(){
+  const url = '/onsalefilter/'
+  const main_category_id = `{{ id }}`;
+  const sub_category_item = '{{ sub_category_item }}'
+  const specific_category_item = '{{ specific_category_item }}'
+
+  if ($("#onsalefilter").is(':checked')){
+    check = true
+  }
+  else{
+    check = false
+  }
+  $.ajax({
+      url: url,
+      data: {
+        'main_category_id': main_category_id,
+        'check': check,
+        'sub_category_item': sub_category_item,
+        'specific_category_item': specific_category_item,
+      },
+      success: function (data){
+        $('#results').empty();
+        $('#results').append($(data).find('#results').html());
+        $('.nosalejs').append($(data).find('.nosalejs').html())
+      }
+  })
+})
+
+$("#inputState").change(function(){
+  const url = $("#sort").attr("data-high-price");
+  const main_category_id = `{{ id }}`;
+  const sub_category_item = '{{ sub_category_item }}'
+  const specific_category_item = '{{ specific_category_item }}'
+
+  const check = $('#inputState').val();
+  $.ajax({
+      url: url,
+      data: {
+        'main_category_id': main_category_id,
+        'check': check,
+        'sub_category_item': sub_category_item,
+        'specific_category_item': specific_category_item,
+      },
+      success: function (data){
+        $('#results').empty();
+        $('#results').append($(data).find('#results').html());
+      }
+  })
+})
+</script>
+<div class="nosalejs">
+{%if onsale == "sale" %}
+<script type="text/javascript">
+  {% for item in items %}
+        {%if request.user.profile.user_type == 'Retailer'%}
+          var original_price='{{ item.specialdeals.specialdealattr_set.first.productsize.retailprice}}';
+          var discounted='{{ item.specialdeals.specialdealattr_set.first.retail_discount_price}}';
+        {%else%}
+          var original_price='{{ item.specialdeals.specialdealattr_set.first.productsize.price}}';
+          var discounted='{{ item.specialdeals.specialdealattr_set.first.discounted_price}}';
+        {%endif%}
+  
+        var original_price=original_price.replace(/,/g, '');
+        var discounted= discounted.replace(/,/g, '');
+        var discount_price = original_price - discounted;
+        var dis=((discount_price/original_price)*100).toFixed(2);;
+        //console.log(original_price,discounted,discount_price,dis);
+        $('#dispercentage_{{ item.specialdeals.id|safe }}').text(dis +'%  '+  '  OFF');
+    {% endfor %}
+
+</script>
+{%endif%}
+</div>
+{% endblock %}

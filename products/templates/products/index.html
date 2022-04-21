@@ -1,0 +1,311 @@
+{% extends "base.html"%}
+{% load static %}
+{% load socialaccount %}
+{% providers_media_js %}
+{% block css%}
+<link rel="stylesheet" href="{% static 'css/popup.css' %}">
+{% endblock %}
+{% block content%}
+<!-- Categories -->
+{% include "categories.html"%}
+{% if messages %}
+  <div class="container-fluid mt-5">
+    {% for message in messages%}
+      <div class="alert alert-{{ message.tags }} mt-3 mb-0">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% if password_reuse == False %}
+  <div class="container-fluid {% if not messages %}mt-5{% endif %} mb-0">
+    <div class="alert alert-danger mt-2 mb-1">
+      <span> Please set your password so that you do not get logged out of your account. <a href="set_password/">Set Password</a> </span>
+    </div>
+  </div>
+{% endif %}
+<!--Banner -->
+
+<section class="slider {% if not messages %}{% if password_reuse %}mt-5{% endif %}{% endif %} pl-3 pr-3" id="slider">
+    <div id="carouselExampleIndicators" class="carousel slide carousel-banner" data-ride="carousel">
+        <div class="carousel-inner">
+          {% for images in slideshow_images %}
+          <div class="carousel-item  {% if forloop.counter0 == 0 %}active{% endif %} ">
+            <a href="{{images.extra_link|default_if_none:'#'}}">
+				<img class="d-block sliderimage h-100" src="{{ images.image.url }}" alt="slide">
+            <!-- <img class="d-block w-100 h-100" src="{{ images.image.url }}" alt="slide"> -->
+			</a>
+          </div>
+          {% endfor %}
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>      
+</section>
+
+<!-- New Arrivals-->
+  {% if new_arrivals %}
+ 
+  <section class="deals mt-2">
+    <div class="card mx-3">
+        <div class="row pt-3 pr-3 pl-3 pb-0">
+            <div class="col-md-6">
+                <div class="card-title"><h3 >New Arrivals</h3></div> 
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'new' %}"><button class="btn btn-dark float-right">VIEW ALL</button></a>
+            </div>
+            <div class="clear-fix"></div>
+        </div><hr>
+        <div class="owl-carousel" id="owl-example-next">
+          {% for new in new_arrivals %} 
+            <div class="card ml-3 item">
+              <a href="{% url 'product-detail' new.slug %}" class="deal-product">
+			  <!-- <div class="newarrival" style="background: url({{ new.image.url}}); background-size:cover; background-position:center center; background-repeat:no-repeat;"> -->
+			  <div class="newscale">
+               <img class="card-img-top img-fluid homepage-img" src="{{ new.image.url }}" alt="Card image cap">
+			  </div>
+                <div class="card-body text-center " >
+				    <!-- <p class="card-title ">{{new.product_title|truncatechars:15 }}</p> -->
+				    <p class="card-title" data-toggle="tooltip" data-placement="top" title='{{new.product_title}}' >{{new.product_title|truncatechars:35 }}</p>
+            {%if request.user.profile.user_type == 'Retailer'%}
+            <p style="font-size:16px">Rs.{%if new.mobilememory_set.first.retailprice%}{{new.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{new.price|default_if_none:' ...'}}{%endif%}</p>
+            {%else%}
+            <p style="font-size:16px">Rs.{%if new.mobilememory_set.first.price%}{{new.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{new.price|default_if_none:' ...'}}{%endif%}</p>
+            {%endif%}
+              </a>
+              {% if new.items_in_stock != 0 %}
+                {% comment %} <button type="button" data-quantity = "1" data-product={{new.id|safe}} data-action="add" data-price="" data-user={{request.user.profile.user_type}} data-feature={{new.mobilememory_set.first.id}} data-color="" style="background-color: #FF9900; color: #fff;" class="btn update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+              {% else %}
+                <p style="color: red; font-size: larger;" class="mt-4">OUT OF STOCK</p>
+              {% endif %}
+              </div>
+          </div>
+          {% endfor %}
+        </div>
+  </section>
+  {% endif %}
+
+<!-- Deals of the Day -->
+  
+
+  <!-- <div class="container-fluid mt-4 mb-4 text-center">
+    <div class="row">
+      {% for images in poster %}
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <img src="{{ images.image.url }}" alt="" class="img-fluid mobileimage">
+		
+		
+      </div>
+      {% endfor %}
+    </div>
+  </div> -->
+  
+{% if special_deals%}
+  <section class="deals mt-2">
+    <div class="card mx-3">
+        <div class="row pt-3 pr-3 pl-3 pb-0">
+            <div class="col-md-6">
+                <div class="card-title"><h5>Deals of the day</h5></div> 
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'special' %}"><button class="btn btn-dark float-right">VIEW ALL</button></a>
+            </div>
+            <div class="clear-fix"></div>
+        </div><hr>
+        <div class="owl-carousel" id="owl-example">
+          {% for deal in special_deals %} 
+            <div class="card ml-3 item">
+              <a href="{% url 'product-detail' deal.product.slug %}" class="deal-product">
+			  <div class="newscale">
+                <img class="card-img-top img-fluid homepage-img" src="{{ deal.product.image.url }}" alt="Card image cap">
+			  </div>
+                <div class="card-body text-center specialdeal">
+                  <p class="card-title" data-toggle="tooltip" data-placement="top" title='{{deal.product.product_title}}'>{{deal.product.product_title|truncatechars:35 }}</p>
+                  <br>
+                  <p style="text-decoration:line-through;font-size:17px;">Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ deal.specialdealattr_set.first.productsize.retailprice}}{%else%}{{ deal.specialdealattr_set.first.productsize.price}}{%endif%}</p>
+				  <p id="dispercentage_{{deal.id|safe}}" style="color:red;font-size:16px"></p>
+                  <p>Rs.{%if request.user.profile.user_type == 'Retailer'%}{{ deal.specialdealattr_set.first.retail_discount_price}}{%else%}{{ deal.specialdealattr_set.first.discounted_price}}{%endif%}</p>
+              </a>
+              {% if deal.product.items_in_stock != 0 %}
+                <form action="{% url 'home' %}" method="POST">
+                  {% csrf_token %}
+                  <input type="text" name="product" hidden value="{{deal.product.id|safe}}">
+                  {% comment %} <button type="button" data-quantity = "1" data-product={{deal.product.id|safe}} data-action="add" data-price="" data-feature={{deal.product.mobilememory_set.first.id}} data-color="" data-user={{request.user.profile.user_type}} class="btn m-3 update-cart" style="background-color: #FF9900; color: #fff;"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+                </form>
+              {% else %}
+              <p style="color: red; font-size: larger;" class="mt-4">OUT OF STOCK</p>
+              {% endif %}
+              </div>
+            </div>
+              {% endfor %}
+        </div>
+  </section>
+  {% endif %}  
+  
+  <!-- Trending Items -->
+  {% if trending_items %}
+  <section class="deals mt-2">
+    <div class="card mx-3">
+        <div class="row pt-3 pr-3 pl-3 pb-0">
+            <div class="col-md-6">
+                <div class="card-title"><h5>Trending Now</h5></div> 
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'trending' %}"><button class="btn btn-dark float-right">VIEW ALL</button></a>
+            </div>
+            <div class="clear-fix"></div>
+        </div><hr>
+        <div class="owl-carousel" id="owl-example-next">
+          {% for trending in trending_items %} 
+            <div class="card ml-3 item">
+              <a href="{% url 'product-detail' trending.product.slug %}" class="deal-product">
+			  <div class="newscale">
+                <img class="card-img-top img-fluid homepage-img" src="{{ trending.product.image.url }}" alt="Card image cap">
+			  </div>
+              <div class="card-body text-center">
+                <p class="card-title" data-toggle="tooltip" data-placement="top" title='{{trending.product.product_title}}'>{{trending.product.product_title|truncatechars:35 }}</p>
+                {%if request.user.profile.user_type == 'Retailer'%}
+                  <p>Rs.{%if trending.product.mobilememory_set.first.retailprice%}{{trending.product.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{trending.product.price|default_if_none:' ...'}}{%endif%}</p>
+                  {%else%}
+                    <p>Rs.{%if trending.product.mobilememory_set.first.price%}{{trending.product.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{trending.product.price|default_if_none:' ...'}}{%endif%}</p>
+                  {%endif%}
+              </a>
+              {% if trending.product.items_in_stock != 0 %}
+                {% comment %} <button type="button" data-quantity = "1" data-product={{trending.product.id|safe}} data-action="add" data-price="" data-feature={{trending.product.mobilememory_set.first.id}} data-color="" data-user={{request.user.profile.user_type}} style="background-color: #FF9900; color: #fff;" class="btn update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+              {% else %}
+                <p style="color: red; font-size: larger;" class="mt-4">OUT OF STOCK</p>
+              {% endif %}
+              </div>
+          </div>
+          {% endfor %}
+        </div>
+  </section>
+  {% endif %}
+  
+  
+
+  <!-- Custom Table -->
+  {% if custom_items %}
+  <section class="deals mt-2">
+    <div class="card mx-3">
+        <div class="row pt-3 pr-3 pl-3 pb-0">
+            <div class="col-md-6">
+                <div class="card-title"><h5>{{ custom_name }}</h5></div> 
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'custom' %}"><button class="btn btn-dark float-right">VIEW ALL</button></a>
+            </div>
+            <div class="clear-fix"></div>
+        </div><hr>
+        <div class="owl-carousel" id="owl-example-next">
+          {% for trending in custom_items %} 
+            <div class="card ml-3 item">
+              <a href="{% url 'product-detail' trending.product.slug %}" class="deal-product">
+			  <div class="newscale">
+                <img class="card-img-top img-fluid homepage-img" src="{{ trending.product.image.url }}" alt="Card image cap">
+			  </div>
+                <div class="card-body text-center">
+				<p class="card-title" data-toggle="tooltip" data-placement="top" title='{{trending.product.product_title}}'>{{trending.product.product_title|truncatechars:35 }}</p>
+          {%if request.user.profile.user_type == 'Retailer'%}
+            <p>Rs.{%if trending.product.mobilememory_set.first.retailprice%}{{trending.product.mobilememory_set.first.retailprice|default_if_none:' ...'}}{%else%}{{trending.product.price|default_if_none:' ...'}}{%endif%}</p>
+            {%else%}
+              <p>Rs.{%if trending.product.mobilememory_set.first.price%}{{trending.product.mobilememory_set.first.price|default_if_none:' ...'}}{%else%}{{trending.product.price|default_if_none:' ...'}}{%endif%}</p>
+            {%endif%}
+              </a>
+              {% if trending.product.items_in_stock != 0 %}
+                {% comment %} <button type="button" data-quantity = "1" data-product={{trending.product.id|safe}} data-action="add" data-price="" data-feature={{deal.product.mobilememory_set.first.id}} data-color="" data-user={{request.user.profile.user_type}} style="background-color: #FF9900; color: #fff;" class="btn update-cart"><i  id="cart-icon" class="fas fa-shopping-cart" style="color: #fff;"></i> Add to Cart</button> {% endcomment %}
+              {% else %}
+                <p style="color: red; font-size: larger;" class="mt-4">OUT OF STOCK</p>
+              {% endif %}
+              </div>
+          </div>
+          {% endfor %}
+        </div>
+  </section>
+  
+  
+  {% endif %}
+
+ <!-- Poster caraseol -->
+<div class="container-fluid mt-4 mb-4 text-center">
+<div ><h3 >Follow us on Instagram</h3></div>
+  <div class="owl-carousel newposter" id="owl-example">
+          {% for new in poster %} 
+            <div class="poster-new">
+				<div class="newposter" style="background: url({{new.image.url}}); background-size:cover; background-position:center; background-repeat:no-repeat;">
+				</div>  
+          </div>
+          {% endfor %}
+        </div>
+</div> 
+  
+  {% if request.user.is_authenticated %}
+  {% else %}
+  <!-- Popup -->
+  <div class="login-popup">
+    <div class="box">
+        <div class="img-area">
+            <div class="img">
+            </div>
+        </div>
+        <div class="form">
+            <div class="close">&times</div>
+            <h1>Login</h1>
+            <form action="{% url 'loginpopup'%}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" placeholder="Username" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <div class="border-top pt-3">
+              <small class="text-muted">Don't have an account?<a href="{% url 'register'%}" class="ml-2">Sign Up Now!</a></small>
+            </div><hr>
+            <div class="text-center">
+              <p>Login With:</p>
+              <div class="login-icon">
+                  <a href="{% provider_login_url 'facebook' method='oauth2' %}"><i class="fab fa-facebook-square"></i></a>
+                  <a href="{% provider_login_url 'google' %}"><i class="fab fa-google"></i></a>
+              </div><br>
+              <p><a href="{% url 'reset_password'%}">Forgot Password?</a></p>
+            </div>
+        </div>
+    </div>
+  </div>
+  {% endif %}
+  <script src="{% static 'js/popup.js' %}"></script>
+  
+<script type="text/javascript">
+
+    $(function() {
+        {% for special_deal in special_deals %}
+          {%if request.user.profile.user_type == 'Retailer'%}
+            var original_price='{{ special_deal.specialdealattr_set.first.productsize.retailprice}}';
+            var discounted='{{ special_deal.specialdealattr_set.first.retail_discount_price}}';
+          {%else%}
+            var original_price='{{ special_deal.specialdealattr_set.first.productsize.price}}';
+            var discounted='{{ special_deal.specialdealattr_set.first.discounted_price}}';
+          {%endif%}
+			
+			var original_price=original_price.replace(/,/g, '');
+			var discounted= discounted.replace(/,/g, '');
+			var discount_price = original_price - discounted;
+			var dis=((discount_price/original_price)*100).toFixed(2);;
+			//console.log(original_price,discounted,discount_price,dis);
+            $('#dispercentage_{{ special_deal.id|safe }}').text(dis +'%  '+  '  OFF');
+        {% endfor %}
+    });
+
+</script>
+  
+{% endblock %}

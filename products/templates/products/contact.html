@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>		
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.column {
+  float: left;
+  width: 33.3%;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin: 8px;
+}
+
+.about-section {
+  padding: 50px;
+  text-align: center;
+  background-color: #474e5d;
+  color: white;
+  <!-- background-image:url('{%static '/images/about_us.jpg'%}');
+  background-repeat:no-repeat;
+  background-size:fill;
+  height:auto;width:100%; -->
+}
+
+.container {
+  padding: 0 16px;
+}
+
+.container::after, .row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.title {
+  color: grey;
+}
+
+.cardbutton {
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: #000;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+}
+.row{
+ padding: 15px 25px;
+}
+.cardbutton:hover {
+  background-color: #555;
+  text-decoration:none;
+   color: white;
+}
+.abouttext{
+	text-align:center;
+}
+<!-- caraseoul  -->
+.carousel-control.right, .carousel-control.left {
+    background-image: none;
+    color: #f4511e;
+  }
+  .carousel-indicators li {
+    border-color: #f4511e;
+  }
+  .carousel-indicators li.active {
+    background-color: #f4511e;
+  }
+  .item h4 {
+    font-size: 19px;
+    line-height: 1.375em;
+    font-weight: 400;
+    font-style: italic;
+    margin: 70px 0;
+  }
+  .item span {
+    font-style: normal;
+  }
+  
+.center {
+  display: block;
+  margin-left: 5%;
+  margin-right: auto;
+  width:25%;
+  height:25%;
+  
+}
+.reviewby{
+	text-decoration:underline;
+	text-decoration-color:#f4511e;
+}  
+@media screen and (max-width: 650px) {
+  .column {
+    width: 100%;
+    display: inline-block;
+  }
+}
+</style>
+
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+
+ 
+
+<div class="about-section" >
+  <h1>About Us</h1>
+  <!-- <p>National mobile </p>
+  <p>leading distributor of electronics goods in Nepal market</p> -->
+</div>
+<br>
+
+<!-- Vision/Mission -->
+
+
+{% for h in heading%}
+<div style="padding: 20px 40px;text-align:justify;" >
+	<div>
+		<h3 style="text-align:center;">{{h.title}}</h3>
+		{% if forloop.counter|divisibleby:2 %}
+			<p><img style="float:right;width:240px;height:210px;margin-left:15px;margin-right:15px;" src="{{h.title_image.url|default_if_none:''}}" alt="Pineapple">{{h.content}}</p>
+        {% else %}
+			<p><img style="float:left;width:240px;height:210px;margin-left:15px;margin-right:15px;" src="{{h.title_image.url}}" alt="Pineapple">{{h.content}}</p>
+        {% endif %}
+		<br>
+	</div>
+</div>	
+{% endfor %}
+<br>
+<!-- <div style="padding: 20px 40px;text-align:justify;" >
+	<h3 style="text-align:center;">Heading 2</h3>
+	<p><img style="float:left;width:240px;height:210px;margin-left:15px;" src="{% static 'images/google.png'%}" alt="Pineapple"></p>
+</div> -->
+
+<h2 style="text-align:center">Our Team</h2>
+
+<div class="row">
+{% for team in team %}
+  <div class="column">
+    <div class="card">
+      <img src="{{team.upload_image.url}}" alt="Jane" class="center">
+      <div class="container">
+        <h2>{{team.name}}</h2>
+        <p class="title">{{team.designation}}</p>
+        <p>{{team.short_description}}</p>
+        <p>{{team.email}}</p>
+        <a  class="cardbutton" href="mailto:{{team.email}}">Contact</a>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+</div>
+
+<!-- <div class="container-fluid mt-4 mb-4 text-center">
+<div ><h3 >Our Team</h3></div>
+ 
+  <div class="owl-carousel newposter" id="owl-example">
+           {% for client in team %}
+			<div class="poster-new">
+				<img class="card-img-top img-fluid ourposter" src="{{client.upload_image.url}}" alt="Card image cap">
+				<div class="card-body text-center">
+					<h3>{{client.name}}</h3>
+					<p class="title">{{client.designation}}</p>
+					<p>{{client.short_description}}</p>
+					<p>{{client.email}}</p>
+					<a  class="cardbutton" href="mailto:{{client.email}}">Contact</a>
+				</div>
+				
+			</div>
+			{% endfor %}
+			
+        </div>
+</div> -->
+
+<div class="container-fluid mt-4 mb-4 text-center">
+<div ><h3 >Our Clients</h3></div>
+  <div class="owl-carousel" id="owl-example-next">
+           {% for client in clients %}
+			<div class="poster-new">
+				<img class="card-img-top img-fluid ourposter" src="{{client.logo.url}}" alt="Card image cap">
+				<div class="card-body text-center">
+					<h3>{{client.company_name}}</h3>					
+				</div>
+				
+			</div>
+			{% endfor %}
+			
+        </div>
+</div>
+
+
+<!-- What customer say -->
+<div class="container-fluid mt-4 mb-4 text-center">
+<div ><h3 style="font-weight:bold;">What customer say</h3></div>
+  <div id="myCarousel" class="carousel slide text-center" data-ride="carousel">
+    <!-- Indicators -->
+    <!-- <ol class="carousel-indicators">
+      <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#myCarousel" data-slide-to="1"></li>
+      <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol> -->
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+	{% for review in review %}
+      <div class="item active">
+        <h4>"{{review.review}}"<br><span class="reviewby" style="font-weight:bold;">{{review.review_by}}</span></h4>
+      </div>
+    {% endfor %}
+    </div>
+
+    <!-- Left and right controls -->
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+</div>
+
+
+<!-- Contact us section -->
+
+
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% load static %}
+
+<style>
+.about{
+	margin-left:28px;
+}
+
+.locations > p {
+    margin-bottom : 5px;
+}
+
+@media screen and (max-width: 480px){
+  .mobilefooter{
+	text-align:center;
+}
+.about{
+	margin:0px 0px;}
+}
+
+@media screen and (max-width: 672px){
+  .mobilefooter{
+	text-align:center;
+}
+.about{
+	margin:0px 0px;}
+}
+
+</style>
+<section id="footer" class="mt-5">
+    <div class="container-fluid">
+        <div class="row mobilefooter">
+            <div class="col-md-3 footer-box">
+                <p class="about"><b>ABOUT US</b></p>
+                <img src="{% static 'images/logo.png' %}" alt="" height="100">
+            </div>
+            <div class="col-md-4 footer-box icons locations">
+                <p><b>CONTACT US</b></p>
+                {%for contacts in contacts%}
+                <h5>{{contacts.outlet}} Outlet</h5>    
+                <h5>{{contacts.title}}</h5>
+                <p><i class="fas fa-map-marker-alt" style="color: #fff; padding-right: 10px;" aria-hidden="true"></i><a href="{%if contacts.link%}{{contacts.link}}{%else%}{%endif%}" style="text-decoration:none;color:#fff;"> {{contacts.Location}}</a></p>
+                <p><i class="fas fa-phone-alt" style="color: #fff; padding-right: 10px;" aria-hidden="true"></i>01-{{contacts.phone_no1|safe}}{%if contacts.phone_no2%},  {{contacts.phone_no2|safe}}{%endif%}</p>
+				{% if contacts.phone_no3 %}
+					<p><i class="fas fa-phone-alt" style="color: #fff; padding-right: 10px;" aria-hidden="true"></i>{{contacts.phone_no3|default_if_none:''|safe}}</p>
+				{% endif %}
+                <p><i class="fas fa-envelope" style="color: #fff; padding-right: 10px;" aria-hidden="true"></i>{{contacts.email}}</p>
+                {%endfor%}
+            </div>
+            <div class="col-md-3 footer-box socials">
+                <p><b>OUR SOCIAL MEDIAS</b></p>
+                <a href="https://www.facebook.com/Shubhakamana-Footwear-products-Nepal-394109617434540" target="_blank"><i class="fab fa-facebook-square fa-2x" style="padding-right: 10px;"></i></a>
+                <a href="" target="_blank"><i class="fab fa-linkedin link fa-2x" style="padding-right: 10px;"></i></a>
+                <a href="" target="_blank"><i class="fab fa-instagram" style="padding-right: 10px;"></i></a>
+            </div>
+            <div class="col-md-2 footer-box">
+                <p><b>USEFUL LINKS</b></p>
+                <ul class="footerlink">
+                    <li><a href="{% url 'about'%}">About Us</a></li>
+                    {% comment %} <li><a href="{% url 'faq'%}">FAQs</a></li> {% endcomment %}
+                    <li><a href="{% url 'contact'%}">Contact Us</a></li>
+                    <li><a href="{% url 'vacancy'%}">Careers</a></li>
+                    <li><a href="{% url 'policy'%}">Privacy Policy</a></li>
+                    <li><a href="{% url 'exchange'%}">Exchange policy</a></li>
+                    {% comment %} <li><a href="{% url 'catelogue'%}">Catalogue</a></li> {% endcomment %}
+                </ul>
+            </div>
+            <hr>
+        </div>
+    </div>
+    <div class="text-center mx-auto copyright-container" style="background-color: #000;">
+        <p class="copyright">&copy; {% now "Y" %} |
+            Subhakamana Footwears | <a href="https://www.prodigytechnosys.com/" style="text-decoration: none; color: #fff;" target="blank">Powered by: Prodigy Technosys Pvt. Ltd</a></p>
+    </div>
+</section>

@@ -1,0 +1,54 @@
+{% load static %}
+<nav class="navbar second-nav navbar-expand-lg navbar-light categories fixed-top"> 
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="">
+            <ul class="navbar-nav">
+                <li class="nav-item categories-each dropdown new-categories">
+                    <a class="nav-link dropdown-toggle browse-categories" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-bars mr-2"></i> BROWSE CATEGORIES <i class="fas fa-chevron-down ml-5"></i></a>
+                    <div class="dropdown-menu main-categories" aria-labelledby="navbarDropdownMenuLink">
+                        {% for c in categories %} 
+                        <div class="{% for sub in sub_categories %} {% if sub.main_category_id == c.id %} dropright {% endif %}{% endfor %}">
+                            <a class="dropdown-item {% for sub in sub_categories %} {% if sub.main_category_id == c.id %}dropdown-toggle{% endif %}{% endfor %}"{% for sub in sub_categories %}{% if sub.main_category_id == c.id %} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{% endif %}{% endfor %} href="{% url 'category_detail' c.slug %}">{{ c.main_category|title }}<i class="{% for sub in sub_categories %}{% if sub.main_category_id == c.id %}fas fa-chevron-right {%endif%}{%endfor%}" style="float: right;"></i></a>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-menu second">
+                                <div class="row">
+                                    {% for sub in sub_categories %}
+                                    {% if sub.main_category_id == c.id %}
+                                    <div class="col-md-3 text-center">
+                                        <a href="{% url 'sub_category_detail' c.slug sub.slug %}"><h5 style="text-transform: uppercase;"><strong>{{ sub.sub_category }}</strong></h5></a>
+                                        {% for specific in specific_category %}
+                                            {% if sub.id == specific.sub_category_id %}
+                                                <a href="{% url 'specific_category_detail' c.slug sub.slug specific.slug %}" class="dropdown-item">{{ specific.specific_category }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <div class="mb-2"></div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </li>
+                {% for c in main_categories %}
+                    <li class="nav-item categories-each colors" style="text-transform:uppercase">
+                        <a href="{% url 'category_detail' c.slug %}" class="nav-link">
+                            {{ c.main_category|title }} 
+                        </a>
+                    </li>
+                {% endfor%}
+                <li class="nav-item categories-each colors" >
+                    <a class="nav-link" href="{% url 'new' %}">NEW ARRIVALS</a> 
+                </li>
+                <!-- <li class="nav-item categories-each colors" >
+                    <a class="nav-link" href="{% url 'all' %}">TOYS & MORE</a> 
+                </li> -->
+            </ul>
+        </div>
+    </div>
+</nav>
+  

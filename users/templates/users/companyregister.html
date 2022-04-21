@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static '/css/register.css' %}">
+    <style>
+        .register-btn-pop{
+            height:45px;
+            width:140px;
+            border-radius:20px;
+            border:none;
+            background:#717fe0;
+            color:#fff;
+            float:right;
+            transition: all .4s ease;
+            -moz-transition: all .4s ease;
+            cursor:pointer;
+            margin-right:10px;
+        }
+        .register-btn-pop:hover{
+            background:rgba(0,0,0,.8);
+        }
+        .fields-pop{
+            width:100%;
+            float:left;
+            height:inherit;
+            margin-bottom:20px;
+        }
+        .fields-pop select{
+            text-transform: capitalize;
+        }
+        
+        {% if person == 'individual' %}
+            #registerForm1_regi{
+                display:block;
+            }
+            #registerForm2_regi{
+                display: none;
+            }
+            #individual_btn_register{
+                background: #0c4e6b;
+
+            }
+            #orga_btn_register{
+                background: #008ECC;
+            }
+        {% endif %}
+        {% if person == 'organisation' %}
+            #registerForm1_regi{
+                display:none;
+            }
+            #registerForm2_regi{
+                display: block;
+            }
+            #individual_btn_register{
+                background: #008ECC;
+
+            }
+            #orga_btn_register{
+                background: #0c4e6b;
+            }
+        {% endif %}
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row mx-0">
+    <div class="col-12">
+        <div class="register-banner">
+            <div class="container">
+                <div class="col col-xl-2 col-lg-2 col-md-1 d-none d-md-inline"></div>
+                <div class="col col-xl-8 col-lg-8 col-md-10">
+                    <div class="register">
+                        <h3>Register</h3>
+                        <hr style="margin-bottom:10px;">
+                        <div class="register_choice1">
+                            <div class="col col-md-6" style="padding: 0px;">
+                                <button type="button" id="individual_btn_register">INDIVIDUAL</button>
+                            </div>
+                            <div class="col col-md-6" style="padding: 0px;">  
+                                <button type="button" id="orga_btn_register">ORGANISATION</button>
+                            </div>
+                        </div>
+                        <form method="POST" action="{%url 'register'%}" id="registerForm1_regi">
+                                {% csrf_token %}
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>First Name<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='first_name'
+                                               placeholder="First name">
+                                    </div>
+
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Last Name<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='last_name'
+                                               placeholder="Last name">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Username<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='username'
+                                               placeholder="Username">
+                                    </div>
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Email<span>*</span></label><br>
+                                        <input type="email" class="form-control" name='email'
+                                               placeholder="Email">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                     <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Address<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='address'
+                                               placeholder="Your Address">
+                                    </div> 
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Contact Number<span>*</span></label><br>
+                                        <input type="number" class="form-control" name='contact'
+                                               placeholder="Your number">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                       <label>City</label><br>
+                                       <input type="text" class="form-control" name='city'
+                                              placeholder="Your City">
+                                   </div> 
+                                   <div class="col col-xl-6 col-lg-6 col-md-6">
+                                       <label>Province Number</label><br>
+                                       <input type="text" class="form-control" name='province'
+                                              placeholder="Your Province Number">
+                                   </div>
+                               </div>
+                               <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                    <label>Zip Code</label><br>
+                                    <input type="text" class="form-control" name='zipcode'
+                                            placeholder="City Zip Code">
+                                </div> 
+                            </div>
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Password<span>*</span></label><br>
+                                        <input type="password" class="form-control" name='password1'
+                                               placeholder="Password">
+                                    </div>
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Confirm Password<span>*</span></label><br>
+                                        <input type="password" class="form-control" name='password2'
+                                               placeholder="Confirm password">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <div class="col col-12">
+                                        <label>Purpose of Register</label><br>
+                                        <textarea name="purpose" class="form-control rounded-0" rows="5"></textarea>
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <p><span>*</span> required fields</p>
+                                </div>
+                                <hr style="float:left; width:100%;">
+                                <div class="fields-pop-error">
+                                    {% for message in messages %}
+                                    {{message}}
+                                    {% endfor %}
+                                </div>
+                                <div class="fields-pop">
+                                    <button type="submit" name="submit" class="register-btn-pop">SIGN UP</button>
+                                </div>
+                            </form>
+                            <form method="POST" action="{%url 'organisationregister'%}" id="registerForm2_regi">
+                                {% csrf_token %}
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>First Name<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='first_name'
+                                               placeholder="First name">
+                                    </div>
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Last Name<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='last_name'
+                                               placeholder="Last name">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Username<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='username'
+                                               placeholder="Username">
+                                    </div>
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Email<span>*</span></label><br>
+                                        <input type="email" class="form-control" name='email'
+                                               placeholder="Email">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                       <label>Address<span>*</span></label><br>
+                                       <input type="text" class="form-control" name='address'
+                                              placeholder="Your Address">
+                                   </div> 
+                                   <div class="col col-xl-6 col-lg-6 col-md-6">
+                                       <label>Contact Number<span>*</span></label><br>
+                                       <input type="number" class="form-control" name='contact'
+                                              placeholder="Your number">
+                                   </div>
+                               </div>
+                               <div class="fields-pop">
+                                   <div class="col col-xl-6 col-lg-6 col-md-6">
+                                      <label>City</label><br>
+                                      <input type="text" class="form-control" name='city'
+                                             placeholder="Your City">
+                                  </div> 
+                                  <div class="col col-xl-6 col-lg-6 col-md-6">
+                                      <label>Province Number</label><br>
+                                      <input type="text" class="form-control" name='province'
+                                             placeholder="Your Province Number">
+                                  </div>
+                              </div>
+
+                           <div class="fields-pop">
+                              <div class="col col-xl-6 col-lg-6 col-md-6">
+                                   <label>Register as<span>*</span></label><br>
+                                   <select name="user_type" class="form-control">
+                                       <option value="Wholesaler">Wholesaler</option>
+                                       <option value="Retailer">Retailer</option>
+                                   </select>
+                               </div>
+                               <div class="col col-xl-6 col-lg-6 col-md-6">
+                                <label>Zip Code</label><br>
+                                <input type="text" class="form-control" name='zipcode'
+                                        placeholder="City Zip Code">
+                            </div> 
+                           </div>
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Company Name<span>*</span></label><br>
+                                        <input type="text" class="form-control" name='company_name'
+                                               placeholder="Company name">
+                                    </div>
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Company Website</label><br>
+                                        <input type="text" class="form-control" name='company_website'
+                                               placeholder="Company website">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Password<span>*</span></label><br>
+                                        <input type="password" class="form-control" name='password1'
+                                               placeholder="Password">
+                                    </div>
+                                    <div class="col col-xl-6 col-lg-6 col-md-6">
+                                        <label>Confirm Password<span>*</span></label><br>
+                                        <input type="password" class="form-control" name='password2'
+                                               placeholder="Confirm password">
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <div class="col col-12">
+                                        <label>Purpose of Register</label><br>
+                                        <textarea name="purpose" class="form-control rounded-0" rows="5"></textarea>
+                                    </div>
+                                </div>
+                                <div class="fields-pop">
+                                    <p><span>*</span> required fields</p>
+                                </div>
+                                <hr style="float:left; width:100%;">
+                                <div class="fields-pop-error">
+                                    {% for message in messages %}
+                                    {{message}}
+                                    {% endfor %}
+                                </div>
+                                <div class="fields-pop">
+                                    <button type="submit" name="submit" class="register-btn-pop">SIGN UP</button>
+                                </div>
+                            </form>
+                    </div>
+                </div>
+                <div class="col col-xl-2 col-lg-2 col-md-1 d-none d-md-inline"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+    $('#individual_btn_register').on('click', function(){
+        $(this).css({"background" : "#0c4e6b"});
+        $('#orga_btn_register').css({"background" : "#008ECC"});
+        $('#registerForm1_regi').show();
+        $('#registerForm2_regi').hide();
+        $('#registerForm1_regi')[0].reset();
+        $('#registerForm2_regi')[0].reset();
+        $('.fields-pop-error').empty();
+    });
+    $('#orga_btn_register').on('click', function(){
+        $(this).css({"background" : "#0c4e6b"});
+        $('#individual_btn_register').css({"background" : "#008ECC"});
+        $('#registerForm2_regi').show();
+        $('#registerForm1_regi').hide();
+        $('#registerForm1_regi')[0].reset();
+        $('#registerForm2_regi')[0].reset();
+        $('.fields-pop-error').empty();
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% include "categories.html"%}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="box-element">
+                <a class="btn btn-outline-dark" href="/">&#x2190;Continue Shopping</a><br> <br>
+                <table class="table">
+                    <tr>
+                        <th><h5>Items: <strong>{{order.get_cart_items}}</strong></strong></h5></th>
+                        <th><h5>Total: <strong>Rs.{{order.get_cart_total}}</strong></strong></h5></th>
+                        <th>
+                            {% if user.is_authenticated %}
+                                {% if cartItems != 0 %}
+                                    <a style="float:float-right; margin: 5px;" class="btn btn-success" href="{% url 'checkout' %}">Checkout</a>
+                                {% endif %}
+                            {% else %}
+                                <!-- <a style="float:float-right; margin: 5px;" class="btn btn-success" onclick="showAlert()" href="/login?next=/checkout/">Checkout</a> -->
+								<a style="float:float-right; margin: 5px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#checkoutorder">Checkout</a>
+                            {% endif %}
+                        </th>
+                    </tr>
+                </table>
+            </div>
+			<!-- Modal checkout-->
+					<div class="modal fade" id="checkoutorder" tabindex="-1" role="dialog" aria-labelledby="orderTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="deleteTitle">Please Select to continue</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <!-- <div class="modal-body">
+                                Are you sure you want to Continue without login? 
+                            </div> -->
+                            <div class="modal-footer">
+								<a style="align:left;" type="button" class="btn btn-success"  href="{% url 'checkout' %}">Continue without login</a>
+								
+                                <!-- <button style="align:left;" type="button" class="btn btn-success" data-toggle="modal" data-target="#anonymoususer" data-dismiss="modal">Continue without login</button> -->
+                                <form action="/login?next=/checkout/" >
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">Login/register</button>
+                                </form>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+					
+			
+			
+            <br>
+            <div class="table-responsive">
+                <table class="table cart-table" style="background-color: #fff; overflow: scroll;">
+                    <thead>
+                      <tr class="text-center">
+                        <th scope="col"></th>
+                        <th scope="col"><strong>Item</strong></th>
+                        <th scope="col"><strong>Price</strong></th>
+                        <th scope="col"><strong>Quantity</strong></th>
+                        <th scope="col"><strong>Total</strong></th>
+                        <th scope="col"><strong>Remove</strong></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items%}
+                        {% if item.product.items_in_stock != 0 %}
+                      <tr class="text-center">
+                        <th style="width: 15%;"><img class="row-image" src="{{ item.product.image.url }}"></th>
+                        <td style="width: 30%;">{{item.product.product_title}} 
+						<p style="color:blue;margin:0px 0px;">
+						Size:  {{item.features|default_if_none:''}}
+						</p>
+                        <p style="color:blue;margin:0px 0px;">
+                            Color:  {{item.colors|default_if_none:''}}
+                        </p>
+						</td>
+                        <td>{{item.product.price|floatformat:2}}</td>
+                        <td>{{item.quantity}}
+                            <div class="quantity ml-2">
+                                {% comment %} <img data-product={{item.product.id|safe}} data-quantity = "1" data-action="add" data-price="" data-color="" class="chg-quantity update-cart" src="{% static  'images/up.png' %}">
+                        
+                                <img data-product={{item.product.id|safe}} data-quantity = "1" data-action="remove" data-price="" data-color="" class="chg-quantity update-cart" src="{% static  'images/down.png' %}"> {% endcomment %}
+                            </div>
+                        </td>
+                        <td>Rs. {{item.get_total}}</td>
+                        <td><a href="" id="trash" action="remove" data-product={{item.product.id|safe}} data-trash="{% url 'itemdelete' %}" onclick="cartItemDel({{item.product.id|safe}},{{item.orderitemid|safe}})"><i class="fas fa-trash-alt" style="color: red;"></i></a></td>
+                      </tr>
+                      {% endif %}
+                      {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAlert(){
+        alert('Please login or register to checkout.');
+    }
+    function cartItemDel(id,orderitemid){
+        const url = $("#trash").attr("data-trash");
+		
+        //const product_id =  $("#trash").attr("data-product")
+        //var productId = $("#trash").attr("data-product")
+		const product_id = id;
+        const oitemid = orderitemid;
+        const action =  $("#trash").attr("action")
+
+        var cart = JSON.parse(getCookie('cart'))
+
+        //if (user == 'AnonymousUser'){
+        //    if (action == 'remove'){
+        //        delete cart[productId]
+        //        document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+        //    }
+        //}
+        //else{
+        $.ajax({
+            url: url,
+            data:{
+                'product_id': product_id,
+                'oitemid': oitemid
+            },
+            success: function (data){
+                console.log(data)
+            }
+        })
+        //}
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load socialaccount %}
+{% providers_media_js %}
+{% load static %}
+
+{% block content %}
+<div class="rounded mt-3">
+    <div class="card p-4 login" style="max-width: 25rem;">
+        <form method="POST" class="p-3">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-2 text-center">Join Today</legend>
+            </fieldset>
+            {{ form | crispy }}
+            <div class="text-center">
+                <button type="submit" class="btn btn-dark" style="width: 100%;">Login</button>
+            </div>
+        </form>
+        <div class="border-top pt-3">
+            <small class="text-muted">Don't have an account?<a href="{% url 'register'%}" class="ml-2">Sign Up Now!</a></small>
+        </div><hr>
+        <div class="text-center">
+            <p>Login With:</p>
+            <div class="login-icon">
+                <a href="{% provider_login_url 'facebook' method='oauth2' %}"><i class="fab fa-facebook-square"></i></a>
+                <a href="{% provider_login_url 'google' %}"><i class="fab fa-google"></i></a>
+            </div> <br>
+            <p><a href="{% url 'reset_password'%}">Forgot Password?</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

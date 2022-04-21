@@ -1,0 +1,1 @@
+from nationalmobile.wsgi import application

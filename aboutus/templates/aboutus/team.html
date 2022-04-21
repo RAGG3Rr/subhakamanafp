@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{%block css%}
+  <style>
+    li{
+      list-style: none;
+    }
+
+    a{
+      text-decoration:none !important;
+    }
+    .item:hover .homepage-img {
+
+      transform: none;
+    }
+  </style>
+{%endblock css%}
+{% block content %}
+<div class="about">
+  <div class="">
+    <div class="row mx-0">
+      <div class="col-12 col-sm-2">
+        {%include 'aboutus/quicklink.html'%}
+      </div>
+      <div class="col-12 col-sm-10">
+        <h2 class="text-center my-2">Our Teams</h2>
+        {%if team%}
+        <div class="row">
+          {%for team in team%}
+          <div class="col-12 col-lg-3 col-md-4 col-sm-6">
+            <div class="card ml-3 item my-3">
+              <a href="" class="deal-product">
+                <div class="newscale mt-2" style="height:300px;">
+                      <img class="card-img-top img-fluid homepage-img" src="{{team.upload_image.url}}" alt="">
+                    <h5 class="mt-2">{{team.name}}</h5>
+                    <p class="title mb-1" style="overflow: hidden">{{team.designation}}</p>
+                    {% comment %} <p style="overflow: hidden">{{team.short_description}}</p> {% endcomment %}
+                    <p>{{team.email}}</p>
+                </div>
+              </a>
+            </div>
+          </div>
+          {%endfor%}
+          {%endif%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%endblock content%}

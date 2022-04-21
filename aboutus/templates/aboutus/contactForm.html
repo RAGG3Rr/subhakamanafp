@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title%} Contact us  {% endblock %}
+
+{% block content %}
+
+
+<div class="banner">
+    <div class="banner-head">
+        Contact Us
+    </div>
+</div>
+
+<div class="container-main">
+    <div class="right">
+        <div class="right-head">How to Find Us</div>
+        <div class="right-content">
+            If you have any questions, just fill the contact form and we will answer you shortly. If you live nearby, come visit out office.
+        </div>
+        <div class="right-subhead">
+            Visit Us
+        </div>
+        <div class="right-content" style="line-height: 30px;">
+            <i class="fa fa-map-marker" aria-hidden="true"> </i> location, location
+            <br>
+            <i class="fa fa-phone" aria-hidden="true"></i> Telephone: 
+            <br>
+            <i class="fa fa-envelope" aria-hidden="true"></i> Email: 
+        </div>
+       
+    </div>
+    <div class="left-head">Get in Touch</div>
+    <div class="form">
+        
+        <form name="contactForm" method="post" action="/contact_us_submission/">
+            {% csrf_token %}
+    
+            <p class="fontform">
+                Name :
+            </p>
+    
+            <p>
+                <input type="text" id="fname" name="firstname" class="nameinp">      
+                <input type="text" id="lname" name="lastname" class="nameinp"> 
+            </p>
+    
+            <p style="margin-top: 40px;" class="fontform">
+                Email Address :
+            </p>
+    
+            <p>
+                <input type="text" name="email">
+            </p>
+    
+            <p style="margin-top: 40px;" class="fontform">
+                Contact Number :
+            </p>
+    
+            <p>
+                <input type="text" name="contactNumber" >
+            </p>
+            
+            <p style="margin-top: 40px;" class="fontform">
+                Message :
+            </p>
+    
+            <textarea name="message" rows="50" ></textarea>
+    
+            <p  style="text-align: center; margin-top: 40px">
+                <button class="button fontform" type="submit">Send</button>
+            </p>
+    
+        </form>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}

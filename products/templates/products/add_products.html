@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{%block css%}
+	<style>
+		#div_id_price{
+			display:none;
+		}
+	</style>
+{%endblock css%}
+{% load static %}
+{% block content %}
+<div class="container" style="margin-top: 9px !important;">
+    <h3 class="text-center">Add Products</h3>
+    <div class="row">
+        <div class="col-12">
+            <form action="{% url 'add_product' %}" method="POST" enctype="multipart/form-data" id="addProduct" data-sub-categories="{% url 'get_subcategories'%}" data-specific-categories="{% url 'get_specificcategories'%}">
+                {% csrf_token %}
+                {{form|crispy}}
+                <div class="text-center">
+                    <button type="submit" id="productsubmit" class="btn mt-2" style="width:30%; background: green; color: #fff;">Add Product</button>
+                </div>
+				<div class="row form-group" id="otherfeature" style="margin:0px auto;display:none;">
+				<div style="float:left;">
+					<table class="table table-responsive table-bordered table-striped table-hover" id="newfeature">
+						<thead>
+						<tr>
+							<th>Size</th>
+							<th>Normal Price</th>
+							<th>Retail Price</th>
+							
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+							<td><input class="form-control" type="text" id="feature" value="" placeholder="Add variants..."></td>
+							<td><input class="form-control" type="number" id="newprice" value="" min="0" placeholder="Enter Normal price"></td>
+							<td><input class="form-control" type="number" id="retailprice" value="" min="0" placeholder="Enter retail price"></td>
+							<td id="addbutton"><strong><a href="javascript:void(0);" id="addnew" class="remove_row "><i class="fa fa-plus"></i>Add new</a></strong> </td>
+							
+							
+							
+							<td style="display:none;" id="rem">
+								<!-- <input class="remove_row" type="button" value="Remove">Remove -->
+								<strong><a href="javascript:void(0);" id="add_bank_info" class="remove_row ">Remove</a></strong>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+					</div>
+					 <div style="float:right;width:50%;padding-left:10px;">
+					<p style="font-size:18px;font-weight:bold;">Select Colors</p>
+					<select class="col-sm-4 form-control" id="selectcolor" style="display:none;height:100px;" multiple>
+							{% for i in color %}
+								<option value="{{i.id|safe}}" style="font-size: 16px;    padding: 5px;">{{i.name|safe}}</option>
+							{% endfor %}
+							</select>
+					</div> 
+					
+					<input type="hidden" id="allfeature" name="allfeature" value="">
+					<input type="hidden" id="colorfeature" name="colorfeature" value="">
+				</div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+status=0;
+features=[];
+prices=[];
+error={};
+
+$('#addnew').click(function(){
+	var ele = $('#newfeature').find('tbody').find('tr:last');
+    var ele_clone = ele.clone();
+    ele_clone.find('input').attr("disabled", false).val('');
+	ele_clone.find("#addbutton").remove();
+    ele_clone.find('td:last').show();
+	ele.after(ele_clone);
+    ele_clone.show();
+	$('.remove_row').show();
+	ele_clone.find('#rem').click(function() {
+	  var row_index = $(this).closest('tr').index();
+      $(this).closest('tr').remove();
+    });
+});
+
+//$('#id_specific_category').change(function(){
+	
+//	$('#id_product_title').after($("#otherfeature"));
+//	$('#otherfeature').show();
+	
+	
+//});
+
+$("#productsubmit").click(function(e) {
+<!-- $('#id_price').change(function(){ -->
+  e.preventDefault();
+  rowCount = $('#newfeature tr').length;
+
+	{% comment %} if ($('.otherfeature').hasClass("hide")){
+		const getpriceval = $('#newfeature').find('tbody:first-child').find('input').val()
+		$('#id_price').val('getpriceval')
+	}
+  //if (rowCount>=2){ {% endcomment %}
+	for (var i = 1; i <rowCount; i++) {
+			var ele = $('#newfeature').find('tbody').find('tr:nth-child(' + i + ')');
+			var ele_clone = ele.clone(); 
+			var tableRow = ele.closest("tr");
+			var feature = tableRow.find("#feature").val();
+			var price = tableRow.find("#newprice").val();
+			var retailprice = tableRow.find("#retailprice").val();
+			if ((feature=='')||(price=='')||(retailprice=='')){
+				status=1;
+				error='One of the feature/price is blank! Please rectify it';
+			}
+			if ((feature=='')&&(price=='')||(retailprice=='')){
+				status=0;
+			}
+			else{
+			features.push(feature,price,retailprice);
+			}
+			//prices.push(price);
+			//alert("#allfeature"+i);
+	}
+	//}
+  var colors=$('#selectcolor').val();
+  
+  features=JSON.stringify(features);
+  //prices=JSON.stringify(prices)
+  
+  $("#colorfeature").val(colors);
+  $("#allfeature").val(features);
+  
+  if (status==1){
+	alert(error);
+	features.length=0;
+	status=0;
+  }
+  else{
+	$('#addProduct').submit();
+  }
+});
+
+    $("#id_main_category").change(function(){
+        const url = $("#addProduct").attr("data-sub-categories");
+        const main_category_id = $(this).val();
+
+        $.ajax({
+            url: url,
+            data: {
+                'main_category_id': main_category_id
+            },
+            success: function (data){
+				//console.log(data);
+                let html_data = '<option value="">--------------</option>';
+                data.forEach(function(sub_dropdown){
+                    html_data += `<option value="${sub_dropdown.id}" data-feature="${sub_dropdown.Add_features}">${sub_dropdown.sub_category}</option>`
+                });
+                $("#id_sub_category").html(html_data);
+            }
+        })
+    })
+    $("#id_sub_category").change(function(){
+        const url = $("#addProduct").attr("data-specific-categories");
+        const sub_category_id = $(this).val();
+		const feature = $(this).find(':selected').data('feature');
+		if (feature == true){
+			$('#id_product_title').after($("#otherfeature"));
+			$('#otherfeature').show();
+			$('#selectcolor').show();
+			{% comment %} $('#div_id_price').addClass('hide'); {% endcomment %}
+		}
+		else{
+			$('#otherfeature').hide();
+			$('#selectcolor').hide();
+		}
+        $.ajax({
+            url: url,
+            data: {
+                'sub_category_id': sub_category_id
+            },
+            success: function (data){
+				
+                let html_data = '<option value="">--------------</option>';
+                data.forEach(function(specific_dropdown){
+                    html_data += `<option value="${specific_dropdown.id}">${specific_dropdown.specific_category}</option>`
+                });
+                //console.log(html_data);
+                $("#id_specific_category").html(html_data);
+            }
+        })
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% url 'home' as home %}
+{% url 'profile' as profile %}
+{% url 'register' as register %}
+{% url 'login' as login %}
+{% url 'all_items' as all %}
+{% url 'orders' as orders %}
+{% url 'cart' as cart %}
+{% url 'blog' as blog %}
+
+{% load static %}
+<header>
+  <div class="container-fluid">
+    <div class="row">
+
+      <div class="col-xs-12 col-sm-12 col-md-1" style="padding:0;">
+        <div class="logo">
+          <a href="{% url 'home'%}">
+            <img src="{% static 'images/logo.png' %}" alt="logo" height="60px" width="100%">
+          </a>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-10">
+        <div class="row ">
+            <div class="col-12  col-md-12">
+            <ul class="header__linkinfo no-print">
+              <li class="header__linkinfo__text">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+              </li>
+            {% if user.is_authenticated %}
+              {% if user.is_superuser %}
+              <li class="header__linkinfo__text">
+                <a class="nav-link" href="{% url 'all_items' %}">All</a>
+              </li>
+              <li class="header__linkinfo__text">
+                  <a class="nav-link" href="{% url 'orders' %}">Orders</a>
+              </li>
+              {% endif %}
+              <li class="header__linkinfo__text">
+                <a class="nav-link" href="{% url 'blog' %}">Blog</a>
+              </li>
+              <li class="header__linkinfo__text">
+                <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+              </li>
+              <li class="header__linkinfo__text" style="border-right: none;">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              </li>
+              
+              {% else %}
+              <li class="header__linkinfo__text">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+              <li class="header__linkinfo__text"  style="border-right: none;">
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-8 col-sm-9 col-md-10">
+            <ul class="header__maininfo__list no-print p-2">
+            <li class="nav-item dropdown category_dropdown">
+              <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Category<i class="fas fa-caret-down float-right"></i>
+              </a>
+              <div class="dropdown-menu category_dropmenu" aria-labelledby="navbarDropdown">
+              {%for category in categories%}
+                <a class="dropdown-item" href="{% url 'category_detail' category.slug %}">{{category.main_category}}</a>
+                {%endfor%}
+              </div>
+            </li>
+            <li class="searchPanel no-print">
+                <form class="suggestion flex" method="POST" action="{% url 'search'%}">
+                  {%csrf_token%}
+                  <div class="suggestion__box">
+                    <input  type="text" class="suggestion__input searchPanel__searchBox"
+                      placeholder="Find your favorite products" name="search" id="search">
+                  </div>
+                  <button type="submit" class="searchPanel__search"><i class="fa fa-search pr-1"></i></button>
+                </form>
+              </li>
+              <li class="header__maininfo__list__item dropdown__cart">
+                <div class="form-inline my-2 my-lg-0 nav_cart">        
+                  <a href="/cart/">
+                    <i id="cart-icon" class="fas fa-shopping-cart header__maininfo__list__item__icon"></i>
+                  </a>
+                  <p id="cart-total">{{cartItems}}</p>
+                </div> 
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+
+    </div>
+  </div>
+</header>
