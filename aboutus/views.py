@@ -73,8 +73,10 @@ def newsletter(request):
             email= request.POST.get('email')
             news= Newsletter.objects.create(email = email)
             news.save()
+            messages.success(request, 'Subscribed Successfully')
             return redirect('home') 
         else:
+            messages.error(request, 'Cannot Subscribe')
             return redirect('home') 
     else:
         return render(request,'base.html')

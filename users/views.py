@@ -241,3 +241,4 @@ def userconfirmationEmail(request,name,usertype,id):
 #     }
 
 #     return render(request,"users/myinvoice",context)
+

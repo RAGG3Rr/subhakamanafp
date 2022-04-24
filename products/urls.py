@@ -46,6 +46,5 @@ urlpatterns = [
     path('high/', views.highToLow, name='high'),
     path('itemdelete/', views.itemdelete, name='itemdelete'),
     path('pricerange/', views.pricerange, name='pricerange'),
-    path('onsalefilter/', views.onsalefilter,name="onsalefilter")
-    
+    path('onsalefilter/', views.onsalefilter,name="onsalefilter"),    
 ]

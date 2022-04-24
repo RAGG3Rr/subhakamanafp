@@ -1,3 +1,4 @@
+from ast import mod
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
@@ -101,4 +102,20 @@ class Profile(models.Model):
             type = self.company_name
         return type
 
+############################################################################################
 
+class Subscription(models.Model):
+    email = models.CharField(max_length=255)
+    status = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.email
+
+
+class ComposeEmail(models.Model):
+    subject = models.CharField(max_length=255)
+    content = models.CharField(max_length=2058)
+    image = models.ImageField(upload_to='img/mail_image', default="", null=True)
+
+    def __str__(self):
+        return self.subject

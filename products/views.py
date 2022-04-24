@@ -29,6 +29,13 @@ from users.models import Profile
 from decimal import Decimal
 from random import randint, randrange
 from django.core.mail import send_mail
+from nationalmobile.settings import EMAIL_HOST_USER
+# from django.core import mail
+# from django.contrib.sites.shortcuts import get_current_site
+# from users.models import Subscription
+# from django.utils.html import strip_tags
+
+
 # Create your views here.
 
     
